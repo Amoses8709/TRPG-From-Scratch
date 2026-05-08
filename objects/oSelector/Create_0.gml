@@ -7,5 +7,6 @@ selectedActor = noone;
 previewedActor = noone;
 selectedNode = noone;
 selectorPaused = false;
+hoverNode = noone;
 //moving = false;
 

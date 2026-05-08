@@ -25,18 +25,18 @@ else{
     
 //Sorts out where everyone is
 with(oNode){
-    if (instance_position(x + CENTER, y + CENTER, oActor)){
+    if (instance_position(x + GHALF, y + GHALF, oActor)){
         //if there is an oActor at this node, it sets the node's occupant = the actor's id
         
-        occupant= instance_position(x + CENTER, y + CENTER, oActor);
+        occupant= instance_position(x + GHALF, y + GHALF, oActor);
         passable = false
         occupant.gridX = gridX;
         occupant.gridY = gridY;
         //show_message(occupant.id == oMainChar.id);
         if(occupant.id == oMainChar.id && other.turnStart && other.activeArmy==BLUEARMY){
             
-            oSelector.selectedActor = self.occupant;
-            oSelector.selectedNode = global.nodeMap[gridX,gridY];
+            //oSelector.selectedActor = self.occupant;
+            //oSelector.selectedNode = global.nodeMap[gridX,gridY];
             oSelector.x = occupant.gridX * GRIDSIZE;
             oSelector.y = occupant.gridY * GRIDSIZE; 
             oSelector.gridX = occupant.gridX;
