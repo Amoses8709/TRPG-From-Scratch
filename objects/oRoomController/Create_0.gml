@@ -11,20 +11,20 @@ selectedNode = noone;
 
 with(oActor){
     if(army==BLUEARMY){
-        array_push(heroChars,id);
+        array_push(other.heroChars,id);
     }
     else{
-        array_push(enemyChars,id);
+        array_push(other.enemyChars,id);
     }
 }
 maxHeroes = array_length(heroChars);
 maxEnemies = array_length(enemyChars);
-maxEnemies =
 
-//  Greate MP grid the size of the room for pathing
-tile_id  = layer_tilemap_get_id(layer_get_id("tile_collision"));
+//  Create MP grid the size of the room for pathing
+tile_id  = layer_tilemap_get_id(("TilesCollision"));
 columns  = tilemap_get_width(tile_id);
 rows     = tilemap_get_height(tile_id);
+//show_message(string(columns)+" : "+string(rows));
 grid_id  = mp_grid_create(0, 0, columns, rows, GRIDSIZE, GRIDSIZE);
 
 //  Greate map array for tracking occupants and neighbors
@@ -48,3 +48,5 @@ mp_grid_add_instances(grid_id, oCollision, false);
 global.grid_id = grid_id;
 move_path  = path_add();
 show_range = true;
+
+instance_create_layer(0,0,"Instances", oSelector);
