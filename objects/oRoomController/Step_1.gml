@@ -1,5 +1,5 @@
 //This means its the beginning of the hero turn
-if(activeArmy==BLUEARMY && maxHeroes == array_length(heroChars)){
+if(activeArmy = BLUEARMY && maxHeroes == array_length(heroChars)){
     roundCounter++;
     turnStart = true;
     
@@ -10,7 +10,7 @@ if(activeArmy==BLUEARMY && maxHeroes == array_length(heroChars)){
     }
 }
 //This means its the beginning of the enemy turn
-else if(activeArmy==REDARMY && maxEnemies == array_length(enemyChars)){
+else if(activeArmy=REDARMY && maxEnemies == array_length(enemyChars)){
     turnStart = true;
     with(oEnemyChar){
        if(army == other.activeArmy){
@@ -27,16 +27,27 @@ else{
 with(oNode){
     if (instance_position(x + CENTER, y + CENTER, oActor)){
         //if there is an oActor at this node, it sets the node's occupant = the actor's id
+        
         occupant= instance_position(x + CENTER, y + CENTER, oActor);
+        passable = false
         occupant.gridX = gridX;
         occupant.gridY = gridY;
-        if(occupant == oMainChar && other.turnStart && other.activeArmy==BLUEARMY){
+        //show_message(occupant.id == oMainChar.id);
+        if(occupant.id == oMainChar.id && other.turnStart && other.activeArmy==BLUEARMY){
+            
             oSelector.selectedActor = self.occupant;
             oSelector.selectedNode = global.nodeMap[gridX,gridY];
+            oSelector.x = occupant.gridX * GRIDSIZE;
+            oSelector.y = occupant.gridY * GRIDSIZE; 
+            oSelector.gridX = occupant.gridX;
+            oSelector.gridY = occupant.gridY;
+            array_pop(other.heroChars);
         }
     }
     
 }
+
+
 
 
 

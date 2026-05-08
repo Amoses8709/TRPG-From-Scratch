@@ -45,6 +45,7 @@
     {"id":{"name":"Room1","path":"rooms/Room1/Room1.yy",},},
     {"id":{"name":"CollisionFunctions","path":"scripts/CollisionFunctions/CollisionFunctions.yy",},},
     {"id":{"name":"MacrosAndMath","path":"scripts/MacrosAndMath/MacrosAndMath.yy",},},
+    {"id":{"name":"scrDebugTextbox","path":"scripts/scrDebugTextbox/scrDebugTextbox.yy",},},
     {"id":{"name":"scrGamePadVars","path":"scripts/scrGamePadVars/scrGamePadVars.yy",},},
     {"id":{"name":"scrMovementRange","path":"scripts/scrMovementRange/scrMovementRange.yy",},},
     {"id":{"name":"scrResolution","path":"scripts/scrResolution/scrResolution.yy",},},

@@ -20,6 +20,7 @@
     {"name":"oNode","order":4,"path":"objects/oNode/oNode.yy",},
     {"name":"oSelector","order":5,"path":"objects/oSelector/oSelector.yy",},
     {"name":"CollisionFunctions","order":1,"path":"scripts/CollisionFunctions/CollisionFunctions.yy",},
+    {"name":"scrDebugTextbox","order":6,"path":"scripts/scrDebugTextbox/scrDebugTextbox.yy",},
     {"name":"scrGamePadVars","order":5,"path":"scripts/scrGamePadVars/scrGamePadVars.yy",},
     {"name":"scrMovementRange","order":2,"path":"scripts/scrMovementRange/scrMovementRange.yy",},
     {"name":"scrResolution","order":4,"path":"scripts/scrResolution/scrResolution.yy",},

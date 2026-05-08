@@ -13,10 +13,6 @@ if(_gp != undefined){
     }    
  } 
 
-
-
-
-
 if(!selectorPaused){
     //User Input    
     inputX = _xMove;
@@ -45,7 +41,7 @@ if(!selectorPaused){
     alarm[0] = 8;
 }
 
-if(selectedActor != noone){
-    gridX = selectedActor.gridX;
-    gridY = selectedActor.gridX;
-}
+//if(selectedActor != noone){
+    //gridX = selectedActor.gridX;
+    //gridY = selectedActor.gridX;
+//}

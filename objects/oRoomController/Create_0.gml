@@ -1,5 +1,7 @@
+//Player army always goes first
 activeArmy = BLUEARMY;
 
+//Turn and round vars
 roundCounter = 0;
 turnMax =  0;
 turnStart = false;
@@ -7,7 +9,6 @@ turnStart = false;
 // Create an array for all enemies and all allies
 heroChars = [];
 enemyChars =[];
-selectedNode = noone;
 
 with(oActor){
     if(army==BLUEARMY){
@@ -24,13 +25,14 @@ maxEnemies = array_length(enemyChars);
 tile_id  = layer_tilemap_get_id(("TilesCollision"));
 columns  = tilemap_get_width(tile_id);
 rows     = tilemap_get_height(tile_id);
-//show_message(string(columns)+" : "+string(rows));
 grid_id  = mp_grid_create(0, 0, columns, rows, GRIDSIZE, GRIDSIZE);
+move_path  = path_add();
+show_range = false;
 
-//  Greate map array for tracking occupants and neighbors
+//  Create map array for tracking occupants, nodes, and neighbors
 global.nodeMap = [];
 
-// Populate mp_grid with the tilemap
+// Populate mp_grid with the collision tilemap
 for (var _c = 0; _c < columns; _c++){
 	for (var _r = 0; _r < rows; _r++){
             mp_grid_add_cell(grid_id, _c, _r);
@@ -44,9 +46,9 @@ for (var _c = 0; _c < columns; _c++){
 // Adds collision objects to MP Grid
 mp_grid_add_instances(grid_id, oCollision, false);
 
-
+//Saves the mp grid as a global
 global.grid_id = grid_id;
-move_path  = path_add();
-show_range = true;
 
+
+//Creates an instance of the selector
 instance_create_layer(0,0,"Instances", oSelector);

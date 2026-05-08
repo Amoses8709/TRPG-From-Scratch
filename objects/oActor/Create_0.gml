@@ -1,4 +1,5 @@
 army = BLUEARMY;
+name = "John Doe";
 
 gridX = 0;
 gridY = 0;
@@ -18,3 +19,15 @@ attackTarget = noone;
 // Variables related to fx-------------------------------------
 shake = 0;
 shakeMag = 0;
+
+//Actor states
+states = {
+    idle: {
+        right:sMainCharIdle
+    },
+    walk: {
+        right:sMainCharWalkRight
+    }
+}
+
+state = states.idle;
