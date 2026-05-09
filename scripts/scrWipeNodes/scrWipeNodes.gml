@@ -6,7 +6,7 @@ function scrWipeNodes(){
         G=0;
         parent = noone;
         color = c_white;
-        sprite = sDefaultNode;
+        sprite_index = sDefaultNode;
     }
 
 }
