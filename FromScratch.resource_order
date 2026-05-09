@@ -48,6 +48,7 @@
     {"name":"Objects","order":1,"path":"folders/Objects.yy",},
     {"name":"Actors","order":3,"path":"folders/Objects/Actors.yy",},
     {"name":"EnemyChar","order":1,"path":"folders/Objects/Actors/EnemyChar.yy",},
+    {"name":"Fonts","order":7,"path":"folders/Objects/Fonts.yy",},
     {"name":"Scripts","order":2,"path":"folders/Scripts.yy",},
     {"name":"Sprites","order":3,"path":"folders/Sprites.yy",},
     {"name":"Effects","order":2,"path":"folders/Sprites/Effects.yy",},

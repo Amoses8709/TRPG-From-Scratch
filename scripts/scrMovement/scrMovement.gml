@@ -1,11 +1,11 @@
-// _start- the node to pathfind from, _move- the unit on the node's movement range, units remaining actions
-function scrMovementRange(_start, _move){
-
-    // Reset all node data
+// _start- the node to pathfind from,_selected - true if node is selected/false if just hovering 
+// _move- the unit on the node's movement range, units remaining actions
+function scrMovementRange(_start, _selected, _move,_atkRange){
+     // Reset all node data
     scrWipeNodes();
     var _open, _closed; // _open - to be checked nodes in range, _closed already checked nodes
     var _current, _neighbor; 
-    var _tempG;
+    var _tempG; 
     
     // Create data structures
     _open = ds_priority_create();
@@ -35,7 +35,7 @@ function scrMovementRange(_start, _move){
             
             //Array contains returns 1 if neighbor is in array or 0 if not in list
             if(array_contains(_closed, _neighbor) = 0 && _neighbor.passable &&
-                _neighbor.occupant == noone && _neighbor.cost +_current.G <= _move){
+                _neighbor.occupant == noone && _neighbor.cost +_current.G <= _move + _atkRange){
                 
                 // only calculate a new G score for neighbor if is hasn't been calculated
                 if (ds_priority_find_priority(_open, _neighbor) == 0 || 
@@ -73,9 +73,6 @@ function scrMovementRange(_start, _move){
         
     }
     
-    //round down all G scores for movement calculations
-    with (oNode) {G = floor(G);}
-    
     //destroy open! SUPER IMPORTANT! NO LEAKS!!!
     ds_priority_destroy(_open);
     
@@ -85,7 +82,7 @@ function scrMovementRange(_start, _move){
         _current = array_get(_closed, ii);
         _current.moveNode = true;
         
-        scrColorMoveNode(_current, _move);
+        scrColorMoveNode(_current, _start.occupant.army, _selected, _move,_current.G);
     }
         
     //_start.sprite = sDefaultNode;
@@ -94,9 +91,23 @@ function scrMovementRange(_start, _move){
 
 }
 
-//node ID to color, selectedActor's move, selectedActor's actions
-function scrColorMoveNode(_node, _move){
-    _node.sprite_index = sMoveNode;
+//node ID to color, Actor's army, is Actor selected, Actor's move, Node's G score. 
+// If G score is greater than move, but still in the array that means its in the attack range
+function scrColorMoveNode(_node, _army,_selected, _move, _cost){
+    if(_army != REDARMY || (_army = REDARMY && !_selected)){
+        if(_cost > _move){
+            _node.sprite_index = sAttackNode;
+            _node.saveAttack = false;
+        }
+        else{ 
+            _node.sprite_index = sMoveNode;
+            _node.saveAttack = false;
+        } 
+    } 
+    else{
+        _node.sprite_index = sAttackNode;
+        // Sets the node to not get wiped by wipe nodes
+        _node.saveAttack = true;
+        _node.debug = true;
+    }
 }
-
-

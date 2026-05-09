@@ -59,6 +59,7 @@
     {"$GMFolder":"","%Name":"Actors","folderPath":"folders/Objects/Actors.yy","name":"Actors","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"EnemyChar","folderPath":"folders/Objects/Actors/EnemyChar.yy","name":"EnemyChar","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"PlayerChar","folderPath":"folders/Objects/Actors/PlayerChar.yy","name":"PlayerChar","resourceType":"GMFolder","resourceVersion":"2.0",},
+    {"$GMFolder":"","%Name":"Fonts","folderPath":"folders/Objects/Fonts.yy","name":"Fonts","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Rooms","folderPath":"folders/Rooms.yy","name":"Rooms","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Scripts","folderPath":"folders/Scripts.yy","name":"Scripts","resourceType":"GMFolder","resourceVersion":"2.0",},
     {"$GMFolder":"","%Name":"Sprites","folderPath":"folders/Sprites.yy","name":"Sprites","resourceType":"GMFolder","resourceVersion":"2.0",},
@@ -81,6 +82,7 @@
   },
   "name":"FromScratch",
   "resources":[
+    {"id":{"name":"fDefault","path":"fonts/fDefault/fDefault.yy",},},
     {"id":{"name":"__InputUpdateController","path":"objects/__InputUpdateController/__InputUpdateController.yy",},},
     {"id":{"name":"oActor","path":"objects/oActor/oActor.yy",},},
     {"id":{"name":"oCollision","path":"objects/oCollision/oCollision.yy",},},
@@ -407,6 +409,7 @@
     {"id":{"name":"scrWipeNodes","path":"scripts/scrWipeNodes/scrWipeNodes.yy",},},
     {"id":{"name":"sAttackNode","path":"sprites/sAttackNode/sAttackNode.yy",},},
     {"id":{"name":"sDefaultNode","path":"sprites/sDefaultNode/sDefaultNode.yy",},},
+    {"id":{"name":"sEnemy","path":"sprites/sEnemy/sEnemy.yy",},},
     {"id":{"name":"sGround","path":"sprites/sGround/sGround.yy",},},
     {"id":{"name":"sMainCharIdle","path":"sprites/sMainCharIdle/sMainCharIdle.yy",},},
     {"id":{"name":"sMainCharWalkRight","path":"sprites/sMainCharWalkRight/sMainCharWalkRight.yy",},},

@@ -4,9 +4,13 @@ gridY = 0;
 
 
 selectedActor = noone;
-previewedActor = noone;
 selectedNode = noone;
 selectorPaused = false;
 hoverNode = noone;
-//moving = false;
+show_range = false;
 
+selectedEnemies = 0;
+activeEnemies = 0;
+
+//moving = false;
+alarmPause = 10

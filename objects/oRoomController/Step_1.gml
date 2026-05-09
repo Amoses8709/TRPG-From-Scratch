@@ -1,3 +1,14 @@
+if(roundCounter=0){
+    with(oHeroChar){
+        array_push(other.heroChars,id);
+        var _Htracker = array_length(other.heroChars);
+    }
+    with(oEnemyChar){
+       array_push(other.enemyChars,id);
+       var _Etracker = array_length(other.enemyChars);
+       }
+}
+
 //This means its the beginning of the hero turn
 if(activeArmy = BLUEARMY && maxHeroes == array_length(heroChars)){
     roundCounter++;

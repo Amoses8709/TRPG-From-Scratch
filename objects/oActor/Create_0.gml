@@ -5,9 +5,10 @@ gridX = 0;
 gridY = 0;
 
 //move and action variables
-move =6; 
+move =2; 
 actions =1;
 canAct = false;
+attackRange = 1;
 
 //variables related to pathing -------------------------------------------------------------
 movePath = path_add();

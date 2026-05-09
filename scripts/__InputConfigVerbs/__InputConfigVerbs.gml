@@ -30,7 +30,7 @@ function __InputConfigVerbs()
     InputDefineVerb(INPUT_VERB.ACTION,  "action",      vk_enter,            gp_face3);
     InputDefineVerb(INPUT_VERB.SPECIAL, "special",     vk_shift,            gp_face4);
     InputDefineVerb(INPUT_VERB.PAUSE,   "pause",       vk_escape,           gp_start);
-    InputDefineVerb(INPUT_VERB.NEXTCHAR,"next char",   vk_alt,                 gp_shoulderr);
+    InputDefineVerb(INPUT_VERB.NEXTCHAR,"next char",   vk_alt,              gp_shoulderr);
     
     if (INPUT_ON_SWITCH)
     {

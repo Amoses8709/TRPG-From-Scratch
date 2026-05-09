@@ -1,3 +1,6 @@
+//Creates an instance of the selector
+instance_create_layer(0,0,"Instances", oSelector);
+
 // Create Camera
 var _w = global.res.width;
 var _h = global.res.height;
@@ -19,20 +22,6 @@ roundCounter = 0;
 turnMax =  0;
 turnStart = false;
 
-// Create an array for all enemies and all allies
-heroChars = [];
-enemyChars =[];
-
-with(oActor){
-    if(army==BLUEARMY){
-        array_push(other.heroChars,id);
-    }
-    else{
-        array_push(other.enemyChars,id);
-    }
-}
-maxHeroes = array_length(heroChars);
-maxEnemies = array_length(enemyChars);
 
 //  Create MP grid the size of the room for pathing
 tile_id  = layer_tilemap_get_id(("TilesCollision"));
@@ -40,7 +29,7 @@ columns  = tilemap_get_width(tile_id);
 rows     = tilemap_get_height(tile_id);
 grid_id  = mp_grid_create(0, 0, columns, rows, GRIDSIZE, GRIDSIZE);
 move_path  = path_add();
-show_range = false;
+
 
 //  Create map array for tracking occupants, nodes, and neighbors
 global.nodeMap = [];
@@ -92,10 +81,9 @@ for (xx = 0; xx < columns; xx ++){
     }
 }
 
+// Create an array for all enemies and all allies
+heroChars = [];
+enemyChars =[];
 
-
-
-//Creates an instance of the selector
-instance_create_layer(0,0,"Instances", oSelector);
-
-
+maxHeroes = instance_number(oHeroChar);
+maxEnemies = instance_number(oEnemyChar);
