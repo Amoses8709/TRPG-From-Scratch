@@ -1,3 +1,16 @@
+// Create Camera
+var _w = global.res.width;
+var _h = global.res.height;
+camera = camera_create_view(0,0,_w,_h,0, oSelector,-1,-1,_w/2,_h/2);
+
+// Enable views and make view 0 visible
+view_enabled = true;
+view_visible[0] = true;
+
+// Assign camera to view 0
+view_set_camera(0, camera);
+
+
 //Player army always goes first
 activeArmy = BLUEARMY;
 
@@ -49,6 +62,37 @@ mp_grid_add_instances(grid_id, oCollision, false);
 //Saves the mp grid as a global
 global.grid_id = grid_id;
 
+// Populate neighbors array
+for (xx = 0; xx < columns; xx ++){
+    for (yy=0;yy<rows;yy++){
+        node = global.nodeMap[xx,yy];
+        
+        // add left neighbor
+        if (xx>0){
+            array_push(node.neighbors, global.nodeMap[xx-1,yy]);
+        }
+        
+        //add right neighbor
+        if (xx<columns-1){
+            array_push(node.neighbors, global.nodeMap[xx+1,yy]);
+        }
+        
+        // add top neighbor
+        if (yy>0){
+            array_push(node.neighbors, global.nodeMap[xx,yy-1]);
+        }
+        
+        // add bottom neighbor
+        if (yy<rows-1){
+            array_push(node.neighbors, global.nodeMap[xx,yy+1]);
+        }
+    }
+}
+
+
+
 
 //Creates an instance of the selector
 instance_create_layer(0,0,"Instances", oSelector);
+
+

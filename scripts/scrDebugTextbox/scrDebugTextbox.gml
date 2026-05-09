@@ -1,9 +1,9 @@
-function scrDebugTextbox(_object){
+function scrDebugTextbox(_node){
     
-    var _tempTitle = "Instances of " +_object +" : " + string(instance_number(_object));
+    var _tempTitle = "G:" + string(_node.G);
     
     draw_set_colour(c_black);
-    draw_rectangle(x+20, 0, x+20 + string_width(_tempTitle), 20,false);
+    draw_rectangle(_node.x+2, _node.y+2, _node.x+2 + string_width(_tempTitle), _node.y+20,false);
     draw_set_colour(c_white);
-    draw_text(x+20, 0, _tempTitle);
+    draw_text(_node.x+2, _node.y+2, _tempTitle);
 }

@@ -6,7 +6,7 @@ gridY = 0;
 
 //move and action variables
 move =6; 
-actions =2;
+actions =1;
 canAct = false;
 
 //variables related to pathing -------------------------------------------------------------

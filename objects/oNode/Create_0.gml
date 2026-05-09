@@ -1,4 +1,4 @@
-neighbors = ds_list_create();
+neighbors = [];
 
 color = c_white;
 

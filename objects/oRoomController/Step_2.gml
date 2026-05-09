@@ -10,5 +10,4 @@ else{
     }
 }
 
-
 if(turnStart) {turnStart = false;}

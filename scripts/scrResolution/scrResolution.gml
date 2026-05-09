@@ -1,7 +1,7 @@
 global.res = {
-    width:480,
-    height: 270,
-    scale: 2
+    width:960,
+    height: 544,
+    scale: 1
     
 }
 

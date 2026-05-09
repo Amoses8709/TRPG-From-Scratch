@@ -1,9 +1,9 @@
 {
   "$GMScript":"v1",
-  "%Name":"scrMovementRange",
+  "%Name":"scrMovement",
   "isCompatibility":false,
   "isDnD":false,
-  "name":"scrMovementRange",
+  "name":"scrMovement",
   "parent":{
     "name":"Scripts",
     "path":"folders/Scripts.yy",

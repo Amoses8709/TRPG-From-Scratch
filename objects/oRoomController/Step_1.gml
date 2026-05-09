@@ -35,8 +35,6 @@ with(oNode){
         //show_message(occupant.id == oMainChar.id);
         if(occupant.id == oMainChar.id && other.turnStart && other.activeArmy==BLUEARMY){
             
-            //oSelector.selectedActor = self.occupant;
-            //oSelector.selectedNode = global.nodeMap[gridX,gridY];
             oSelector.x = occupant.gridX * GRIDSIZE;
             oSelector.y = occupant.gridY * GRIDSIZE; 
             oSelector.gridX = occupant.gridX;
