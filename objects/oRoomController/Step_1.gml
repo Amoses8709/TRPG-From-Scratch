@@ -40,7 +40,7 @@ with(oNode){
         //if there is an oActor at this node, it sets the node's occupant = the actor's id
         
         occupant= instance_position(x + GHALF, y + GHALF, oActor);
-        passable = false
+        walkable = false
         occupant.gridX = gridX;
         occupant.gridY = gridY;
         //show_message(occupant.id == oMainChar.id);

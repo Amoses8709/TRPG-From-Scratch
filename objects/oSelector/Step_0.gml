@@ -65,6 +65,8 @@ if(!selectorPaused){
     y= gridY * GRIDSIZE;
     hoverNode = global.nodeMap[gridX,gridY];
     hoverNode.occupant = global.nodeMap[gridX,gridY].occupant;
+    
+    
     // If hovernode is occupied it shows the occupants range
     if(hoverNode.occupant != noone){
         scrMovementRange(hoverNode,hoverNode.selected, hoverNode.occupant.move, hoverNode.occupant.attackRange);    

@@ -4,6 +4,7 @@ function scrWipeNodes(){
         if(!saveAttack){
             moveNode=false;
             attackNode = false;
+            edge = false;
             G=0;  
             parent = noone;
             color = c_white;

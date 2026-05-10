@@ -43,7 +43,7 @@ for (var _c = 0; _c < columns; _c++){
         global.nodeMap[_c,_r].gridX = _c;
         global.nodeMap[_c,_r].gridY = _r;   
         if(collision(_c,_r,"Env")){
-             global.nodeMap[_c,_r].passable = false;
+             global.nodeMap[_c,_r].walkable = false;
         }
     }
 }

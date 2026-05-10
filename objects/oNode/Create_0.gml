@@ -3,7 +3,8 @@ neighbors = [];
 color = c_white;
 
 occupant = noone;
-passable = true;
+walkable = true;
+edge= false;
 gridX = 0;
 gridY = 0;
 selected = false;
