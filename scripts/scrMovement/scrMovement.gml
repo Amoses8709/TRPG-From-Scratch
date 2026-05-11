@@ -108,9 +108,11 @@ function scrMovementRange(_start, _selected, _move,_atkRange){
                     _edgeNeighborX = clamp(_current.gridX+jj,0,oRoomController.columns-1);
                     _edgeNeighborY = clamp(_current.gridY+kk,0,oRoomController.rows-1);
                     _edgeNeighbor = global.nodeMap[_edgeNeighborX,_edgeNeighborY];
+                    if(!_selected == true){_edgeNeighbor.saveAttack = false;}
                     if(_edgeNeighbor.sprite_index =sDefaultNode && _edgeNeighbor.walkable){ 
                         _edgeNeighbor.sprite_index = sAttackNode;
-                        _edgeNeighbor.saveAttack = false;
+                        if(_selected == true){_edgeNeighbor.saveAttack = true;} 
+                        else{_edgeNeighbor.saveAttack = false;}
                     }
                        
                 }
@@ -140,9 +142,6 @@ function scrColorMoveNode(_node, _army,_selected, _move, _cost){
         } 
     } 
     else{
-        if(_node.gridX = 5){
-            var _thing1=1 + _node.gridY;
-        }
         _node.sprite_index = sAttackNode;
         // Sets the node to not get wiped by wipe nodes
         _node.saveAttack = true;

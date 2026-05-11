@@ -102,12 +102,13 @@ if(!selectorPaused){
             if(selectedNode.selected == false){
                 selectedNode.selected = true;
             }
+            //Need to replace this when implementing cancel
             else{
+                selectedNode.selected = false;
                 //player options stuff tbd
             }
         }
         
-        //show_message(string(selectedNode) + string(selectedActor));
         scrMovementRange(selectedNode, selectedNode.selected, selectedActor.move, selectedActor.attackRange);
         
         selectedActor = hoverNode.occupant;
