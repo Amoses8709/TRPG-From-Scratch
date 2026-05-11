@@ -104,15 +104,14 @@ function scrMovementRange(_start, _selected, _move,_atkRange){
                     if(abs(jj)+abs(kk)>_atkRange){
                         continue;
                     }
-                    
                     _edgeNeighborX = clamp(_current.gridX+jj,0,oRoomController.columns-1);
                     _edgeNeighborY = clamp(_current.gridY+kk,0,oRoomController.rows-1);
                     _edgeNeighbor = global.nodeMap[_edgeNeighborX,_edgeNeighborY];
-                    if(!_selected == true){_edgeNeighbor.saveAttack = false;}
-                    if(_edgeNeighbor.sprite_index =sDefaultNode && _edgeNeighbor.walkable){ 
+                    if(!_selected == true){
+                        _edgeNeighbor.saveAttack = false;}
+                    if(_edgeNeighbor.sprite_index != sMoveNode && _edgeNeighbor.walkable){ 
                         _edgeNeighbor.sprite_index = sAttackNode;
                         if(_selected == true){_edgeNeighbor.saveAttack = true;} 
-                        else{_edgeNeighbor.saveAttack = false;}
                     }
                        
                 }
@@ -148,4 +147,3 @@ function scrColorMoveNode(_node, _army,_selected, _move, _cost){
         _node.debug = true;
     }
 }
-

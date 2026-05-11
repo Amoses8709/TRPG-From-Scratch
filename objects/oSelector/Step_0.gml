@@ -69,10 +69,18 @@ if(!selectorPaused){
     
     // If hovernode is occupied it shows the occupants range
     if(hoverNode.occupant != noone){
-        scrMovementRange(hoverNode,hoverNode.selected, hoverNode.occupant.move, hoverNode.occupant.attackRange);    
+        // If hovering over a different actor than the selected actor, don't do anything
+        if(!(selectedActor != noone && hoverNode.occupant != selectedActor)){
+            scrMovementRange(hoverNode,hoverNode.selected, hoverNode.occupant.move, hoverNode.occupant.attackRange);    
+        } 
     }
-    // If hovernode isn't occupied then wipe nodes
-    else{ 
+    // If hovernode isn't occupied but a hero is selected
+    else if(hoverNode.occupant == noone && selectedActor != noone && selectedActor.army = BLUEARMY){
+        // don't wipe nodes
+        
+    }
+    // If hovernode isn't occupied and a hero isn't then wipe nodes
+    else{
          scrWipeNodes(); 
     }
     
@@ -83,8 +91,10 @@ if(!selectorPaused){
     
     // Selecting a hovered over node
     if((InputCheck(INPUT_VERB.ACCEPT) && global.nodeMap[gridX,gridY].occupant != noone)){
+        
         selectedNode = global.nodeMap[gridX,gridY];
         selectedActor = global.nodeMap[gridX,gridY].occupant;
+       
         // If the node is already selected and the occupant was an enemy, decrement selected enemies
         if(selectedNode.selected == true && selectedActor.army =REDARMY){
             //unselect it and decrement selected enemies
@@ -102,7 +112,7 @@ if(!selectorPaused){
             if(selectedNode.selected == false){
                 selectedNode.selected = true;
             }
-            //Need to replace this when implementing cancel
+            //Need to replace this when implement
             else{
                 selectedNode.selected = false;
                 //player options stuff tbd
@@ -118,6 +128,18 @@ if(!selectorPaused){
         alarm[0] = alarmPause; 
     }
     
+    if(InputCheck(INPUT_VERB.CANCEL)){
+        if(selectedActor != noone && selectedActor.army = BLUEARMY) {
+            with(oNode){
+                if(occupant == other.selectedActor){
+                    scrMovementRange(self, false, other.selectedActor.move, other.selectedActor.attackRange);
+                }
+            }
+            selectedActor = noone;
+            selectedNode = noone;
+            scrWipeNodes();
+        }
+    }
 }
 
 // If the player has manually selected all of the enemies, show range is flipped to true
