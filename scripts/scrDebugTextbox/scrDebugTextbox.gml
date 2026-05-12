@@ -1,9 +1,9 @@
-function scrDebugTextbox(_node){
+function scrDebugTextbox(oSelector){
     
-    var _tempTitle = "walkable: " + string(_node.walkable) + " Occupant: "+ string(_node.occupant) + "G: "+string(_node.G);
+    var _tempTitle = "Selected Enemies: "+string(selectedEnemies);
     
     draw_set_colour(c_black);
-    draw_rectangle(_node.x+2, _node.y+2, _node.x+2 + string_width(_tempTitle), _node.y+20,false);
+    draw_rectangle(x+2, y+2, x+2 + string_width(_tempTitle), y+20,false);
     draw_set_colour(c_white);
-    draw_text(_node.x+2, _node.y+2, _tempTitle);
+    draw_text(x+2, y+2, _tempTitle);
 }

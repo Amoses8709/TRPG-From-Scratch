@@ -1,7 +1,7 @@
 function scrWipeNodes(){
     //reset data of ALL nodes
     with(oNode){
-        if(!saveAttack){
+        if(!saveNode){
             moveNode=false;
             attackNode = false;
             edge = false;

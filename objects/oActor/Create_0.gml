@@ -9,6 +9,7 @@ move =4;
 actions =1;
 canAct = false;
 attackRange = 3;
+selected = false;
 
 //variables related to pathing -------------------------------------------------------------
 movePath = path_add();

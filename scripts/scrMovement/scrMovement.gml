@@ -20,6 +20,8 @@ function scrMovementRange(_start, _selected, _move,_atkRange){
         // remove node with the lowest G score from open
         _current = ds_priority_delete_min(_open);
         
+        //if node was added to open, then it is a viable move node
+        _current.moveNode = true;
         if(_current.G = _move){
             _current.edge = true;
         }
@@ -37,15 +39,13 @@ function scrMovementRange(_start, _selected, _move,_atkRange){
             // neighbor isn't ALREADY on the closed list
             
             //Array contains returns 1 if neighbor is in array or 0 if not in list
-            
-            //if(_atkRange =1){
+
            
             if(array_contains(_closed, _neighbor) = 0 && _neighbor.walkable &&
-            _neighbor.occupant == noone && _neighbor.cost +_current.G <= _move + _atkRange){
+            _neighbor.occupant == noone && _neighbor.cost +_current.G <= _move){// + _atkRange){
             
                 // only calculate a new G score for neighbor if is hasn't been calculated
-                if (ds_priority_find_priority(_open, _neighbor) == 0 || 
-                   ds_priority_find_priority(_open, _neighbor)== undefined) {
+                if (ds_priority_find_priority(_open, _neighbor) == 0 ||  ds_priority_find_priority(_open, _neighbor)== undefined) {
                    
                    // give neighbor the appropiate parent
                    _neighbor.parent = _current;
@@ -84,15 +84,8 @@ function scrMovementRange(_start, _selected, _move,_atkRange){
     //destroy open! SUPER IMPORTANT! NO LEAKS!!!
     ds_priority_destroy(_open);
     
-    // color all the move nodes
-    for (ii = 0; ii < array_length(_closed); ii++) {
-        
-        _current = array_get(_closed, ii);
-        //if(_current.walkable) {
-            scrColorMoveNode(_current, _start.occupant.army, _selected, _move,_current.G);
-        //}
-    }
-    // color all the hero attack nodes
+    
+    // color all the attack nodes
     for (ii = 0; ii < array_length(_closed); ii++) {
         var _edgeNeighborX = 0;
         var _edgeNeighborY = 0;
@@ -101,27 +94,41 @@ function scrMovementRange(_start, _selected, _move,_atkRange){
         if(_current.edge){
             for(jj = -_atkRange; jj<= _atkRange; jj++){
                 for(kk = -_atkRange; kk <= _atkRange; kk++){
-                    if(abs(jj)+abs(kk)>_atkRange){
-                        continue;
-                    }
+                    
                     _edgeNeighborX = clamp(_current.gridX+jj,0,oRoomController.columns-1);
                     _edgeNeighborY = clamp(_current.gridY+kk,0,oRoomController.rows-1);
                     _edgeNeighbor = global.nodeMap[_edgeNeighborX,_edgeNeighborY];
-                    if(!_selected == true){
-                        _edgeNeighbor.saveAttack = false;}
-                    if(_edgeNeighbor.sprite_index != sMoveNode && _edgeNeighbor.walkable){ 
-                        _edgeNeighbor.sprite_index = sAttackNode;
-                        if(_selected == true){_edgeNeighbor.saveAttack = true;} 
+                    if(_edgeNeighbor = global.nodeMap[4,3]){
+                        var _thing =1;
                     }
-                       
+                    //if the abs value of offset > than attack range or the node is a move node
+                    //then we skip making it an attack node 
+                    if(!(abs(jj)+abs(kk)>_atkRange || _edgeNeighbor.moveNode)){
+                        // If the node isn't selected then don't save
+                        if(_edgeNeighbor.walkable){
+                            if(!_selected == true){
+                               _edgeNeighbor.saveNode = false;
+                               _edgeNeighbor.sprite_index = sAttackNode;
+                            }
+                           else{ 
+                                _edgeNeighbor.sprite_index = sAttackNode;
+                                _edgeNeighbor.saveNode = true;
+                            } 
+                        }
+                    }
                 }
-            
             }
-            
         }
-
     }    
 
+    // color all the move nodes
+    for (ii = 0; ii < array_length(_closed); ii++) {
+        
+        _current = array_get(_closed, ii);
+        //if(_current.walkable) {
+            scrColorMoveNode(_current, _start.occupant.army, _selected, _move,_current.G);
+        //}
+    }
     
     //scrCreateButtons(_start.occupant);
 
@@ -130,20 +137,33 @@ function scrMovementRange(_start, _selected, _move,_atkRange){
 //node ID to color, Actor's army, is Actor selected, Actor's move, Node's G score. 
 // If G score is greater than move, but still in the array that means its in the attack range
 function scrColorMoveNode(_node, _army,_selected, _move, _cost){
-    if(_army != REDARMY || (_army = REDARMY && !_selected)){
-        if(_cost > _move && _node.walkable){
-            _node.sprite_index = sAttackNode;
-            _node.saveAttack = false
-        }
-        else{
-            _node.sprite_index = sMoveNode;
-            _node.saveAttack = false;
-        } 
-    } 
+    //Blue army never saves attack nodes
+    if(_army = BLUEARMY){ 
+       if(_node.moveNode){
+           _node.sprite_index = sMoveNode;
+       }
+       else if(_node.passable){
+           _node.sprite_index = sAttackNode;
+       }
+   }
+    //If red army
     else{
-        _node.sprite_index = sAttackNode;
-        // Sets the node to not get wiped by wipe nodes
-        _node.saveAttack = true;
-        _node.debug = true;
+        if(_selected){
+            _node.sprite_index = sAttackNode;
+            // Sets the node to not get wiped by wipe nodes
+            _node.saveNode = true;
+            
+               
+        } 
+        else{
+            if(_cost > _move && _node.walkable){
+                _node.sprite_index = sAttackNode;
+                _node.saveNode = false
+            }
+            else{
+                _node.sprite_index = sMoveNode;
+                _node.saveNode = false;
+            } 
+        }
     }
 }

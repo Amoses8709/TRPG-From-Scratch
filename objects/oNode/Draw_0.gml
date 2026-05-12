@@ -8,6 +8,6 @@
     //draw_set_font(fDefault);
     //draw_text(x+2, y+2, _tempTitle);
     //
-    ////show_message(string(gridX) + ":" + string(gridY) + ":" + string(saveAttack));
+    ////show_message(string(gridX) + ":" + string(gridY) + ":" + string(saveNode));
 //}
 draw_self();
