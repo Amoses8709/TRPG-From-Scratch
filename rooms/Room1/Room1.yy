@@ -6,12 +6,12 @@
   "inheritCreationOrder":false,
   "inheritLayers":false,
   "instanceCreationOrder":[
-    {"name":"inst_1AC97F5","path":"rooms/Room1/Room1.yy",},
-    {"name":"inst_5112F620","path":"rooms/Room1/Room1.yy",},
     {"name":"inst_1D4E8705","path":"rooms/Room1/Room1.yy",},
+    {"name":"inst_1AC97F5","path":"rooms/Room1/Room1.yy",},
     {"name":"inst_27C02600","path":"rooms/Room1/Room1.yy",},
     {"name":"inst_3294EC87","path":"rooms/Room1/Room1.yy",},
     {"name":"inst_306C7851","path":"rooms/Room1/Room1.yy",},
+    {"name":"inst_5112F620","path":"rooms/Room1/Room1.yy",},
   ],
   "isDnd":false,
   "layers":[
@@ -52,7 +52,7 @@
   "roomSettings":{
     "Height":544,
     "inheritRoomSettings":false,
-    "persistent":false,
+    "persistent":true,
     "Width":480,
   },
   "sequenceId":null,

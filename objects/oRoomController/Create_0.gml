@@ -1,5 +1,4 @@
-//Creates an instance of the selector
-instance_create_layer(0,0,"Instances", oSelector);
+
 
 // Create Camera
 var _w = global.res.width;
@@ -87,3 +86,6 @@ enemyChars =[];
 
 maxHeroes = instance_number(oHeroChar);
 maxEnemies = instance_number(oEnemyChar);
+
+//Creates an instance of the selector
+instance_create_layer(0,0,"Instances", oSelector);

@@ -125,9 +125,7 @@ function scrMovementRange(_start, _selected, _move,_atkRange){
     for (ii = 0; ii < array_length(_closed); ii++) {
         
         _current = array_get(_closed, ii);
-        //if(_current.walkable) {
-            scrColorMoveNode(_current, _start.occupant.army, _selected, _move,_current.G);
-        //}
+        scrColorMoveNode(_current, _start.occupant.army, _selected, _move,_current.G);
     }
     
     //scrCreateButtons(_start.occupant);

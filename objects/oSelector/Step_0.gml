@@ -1,3 +1,11 @@
+activeEnemies = array_length(oRoomController.enemyChars);
+if(selectedEnemies+selectedHero=0){
+    noOneSelected = true;
+    }
+else{
+    noOneSelected = false;
+}
+
 if(!selectorPaused){
     if(InputCheck(INPUT_VERB.PAUSE)){
         // Main menu tbd
@@ -56,8 +64,9 @@ if(!selectorPaused){
         alarm[0] = alarmPause; 
     }
     
+    //Handles hovering and no button pushes.
     
-    // If there is input
+    // If there is directional input
     if (inputX!=0||inputY!=0){
         
         //show_message(string(oRoomController.columns)+" : "+string(oRoomController.rows));
@@ -71,26 +80,33 @@ if(!selectorPaused){
     hoverNode = global.nodeMap[gridX,gridY];
     hoverNode.occupant = global.nodeMap[gridX,gridY].occupant;
     
-    
-    // If hovernode is occupied it shows the occupantss range
+    //Hovering treats red and blue army the same
+    // If hovernode is occupied 
     if(hoverNode.occupant != noone){
-        // If hovering over a different actor than the selected actor, don't do anything
-        if(!(selectedActor != noone && hoverNode.occupant != selectedActor)){
-            scrMovementRange(hoverNode,hoverNode.occupant.selected, hoverNode.occupant.move, hoverNode.occupant.attackRange);    
+         // And there are no selected actors, draw occupants range
+        if(noOneSelected){
+            scrMovementRange(hoverNode,false, hoverNode.occupant.move, hoverNode.occupant.attackRange);    
+        }
+        //else someone is selected
+        else {
+            //loop through selected array and find matching id
+            //for(ii=0;ii<sHeight;ii++){
+                ////if hovernode is occupied, by a selected actor
+                //if(hoverNode.occupant == selected[ii][0]){
+                    //hoverNode.occupant.selected=true
+                    //scrMovementRange(hoverNode,true, hoverNode.occupant.move, hoverNode.occupant.attackRange);    
+                //}
+            //}
         } 
-    }
-    //if hovernode is occupied, by the seleected actor
-    
-    
-    // If hovernode isn't occupied but a hero is selected
-    else if(hoverNode.occupant == noone && selectedActor != noone && selectedActor.army = BLUEARMY){
-        // don't wipe nodes
-        
-    }
-    // If hovernode isn't occupied and a hero isn't selected then wipe nodes
+        //else the hovernode is occupied, but not by any selected actors so do nothing
+    } 
+    // If hovernode isn't occupied
     else{
-         scrWipeNodes(); 
-    }
+        //And there are no selected actors wipe nodes
+        if(selectedEnemies+selectedHero =0){
+            scrWipeNodes(); 
+        }
+    }   
     
     inputX=0;
     inputY=0;
@@ -99,83 +115,99 @@ if(!selectorPaused){
     
     // Selecting a non-empty hovered over node
     if((InputCheck(INPUT_VERB.ACCEPT) && global.nodeMap[gridX,gridY].occupant != noone)){
-        selectedNode = global.nodeMap[gridX,gridY];
-        selectedActor = global.nodeMap[gridX,gridY].occupant;
         
-        //the selected actor is blue and they were already selected
-        if(selectedActor.army = BLUEARMY && selectedActor.selected){
-            //player options stuff tbd
-        }
-        else if(selectedActor.army =BLUEARMY){
-            if(selectedActor.selected == false){
-                selectedActor.selected = true;
+        // if there are no selected actors selected 
+        if(selectedEnemies+selectedHero=0){
+            //if the newly selected actor is an enemy
+            if(global.nodeMap[gridX,gridY].occupant.army = REDARMY){
+                selectedEnemies +=1;
             }
+            //if the newly selected actor is a hero
+            else{selectedHero = true;}
+            
+            // then loop through selected array and find matching id
+            for(ii=0;ii<sHeight;ii++){
+                if(global.nodeMap[gridX,gridY].occupant == selected[ii][0]){
+                    global.nodeMap[gridX,gridY].occupant.selected = true;
+                    selected[ii][1] = global.nodeMap[gridX,gridY]; // SelectedNode 
+                    scrMovementRange(selected[ii][1], true, selected[ii][0].move, selected[ii][0].attackRange); 
+                }
+            }
+             
         }
             
-        // If the actor is already selected and is an enemy, decrement selected enemies
-        else if(selectedActor.army =REDARMY && selectedActor.selected){
-                //unselect it and decrement selected enemies
-                selectedActor.selected = false;
-                selectedEnemies -=1;
-                show_range = false;
-                scrMovementRange(selectedNode, selectedActor.selected, selectedActor.move, selectedActor.attackRange);
-                scrWipeNodes();           
-                
-                // This will redraw the range for any remaining enemies incase the removed enemy had overlapping ranges
-                if(selectedEnemies > 0){
-                    with(oNode){
-                        if(occupant != noone){
-                            if(occupant.army=REDARMY && occupant.selected){
-                                scrMovementRange(self, occupant.selected, occupant.move, occupant.attackRange);
-                            }
+        //else there is at least 1 selected actor
+        else {
+            // if there is 1 or more enemies selected
+            if(selectedEnemies > 0){
+                //check all enemies in the array
+                for(ii=0;ii<sHeight;ii++){
+                    //Find the occupant of the selected node in selected array
+                    if(selected[ii][0] = global.nodeMap[gridX,gridY].occupant){
+                        //if this node isn't already selected, then select it
+                        if(selected[ii][1]==noone){ 
+                            global.nodeMap[gridX,gridY].occupant.selected = true;
+                            selected[ii][1] = global.nodeMap[gridX,gridY];
+                            selectedEnemies +=1;
+                            //skip drawing it here, selected enemies will be drawn after
+                            //scrMovementRange(selected[ii][1], true, selected[ii][0].move, selected[ii][0].attackRange);
+                        }
+                        //else the node is already selected and deselect it
+                        else{
+                            global.nodeMap[gridX,gridY].occupant.selected = false;
+                            scrMovementRange(selected[ii][1], false, selected[ii][0].move, selected[ii][0].attackRange);
+                            selected[ii][1] = noone;
+                            selectedEnemies -=1;
+                            show_range = false;
                         }
                     }
-                } 
-                //scrWipeNodes();
-             }
-             // If the node isn't already selected and the occupant was an enemy, increment selected enemies
-            else if(selectedActor.selected == false && selectedActor.army =REDARMY){
-                 selectedActor.selected = true;
-                 selectedEnemies +=1;
+                }
+                // This will redraw the range for any remaining enemies incase the removed enemy had overlapping ranges
+                for(ii=0;ii<sHeight;ii++){
+                    //if this node is still selected, then redraw
+                    if(selected[ii][1]!=noone){ 
+                        scrMovementRange(selected[ii][1], true, selected[ii][0].move, selected[ii][0].attackRange);
+                    }
+                }
             }
-            //IF the selected actor is blue and there wasn't already a selected actor
-            else if(selectedActor.army =BLUEARMY){
-                if(selectedActor.selected == false){
-                     selectedActor.selected = true;
-                 }
-                 //Need to replace this when implement
-                 else{
-                     selectedActor.selected = false;
-                     //player options stuff tbd
-                 }
+            if(selectedHero){
+                //Show hero options, but don't unselect or add selections.
+                //Player must cancel selcection before selection anything else.
             }
+                
+        }
              
-            scrMovementRange(selectedNode, selectedActor.selected, selectedActor.move, selectedActor.attackRange);
-             
-            selectedActor = hoverNode.occupant;
-            selectedNode = global.nodeMap[gridX,gridY];
         }
         selectorPaused = true;
         alarm[0] = alarmPause; 
     
     
     if(InputCheck(INPUT_VERB.CANCEL)){
-        if(selectedActor != noone && selectedActor.army = BLUEARMY) {
-            with(oNode){
-                if(occupant == other.selectedActor){
-                    scrMovementRange(self, false, other.selectedActor.move, other.selectedActor.attackRange);
+        
+        // if there is an actor selected
+        if(noOneSelected = false){
+            // then loop through selected array 
+            for(ii=0;ii<sHeight;ii++){
+                //and find blue actor with non-noone node
+                if(selected[ii][1]!= noone){
+                    if(selected[ii][0].army = BLUEARMY){
+                        //then redraw range as not selected, so it can be wiped
+                        scrMovementRange(selected[ii][1], false, selected[ii][0].move, selected[ii][0].attackRange);
+                        selected[ii][1]= noone;
+                        selected[ii][0].selected = false;
+                        selectedHero = false;
+                    }
                 }
             }
-            selectedActor = noone;
-            selectedNode = noone;
-            scrWipeNodes();
+        scrWipeNodes();    
         }
+        //else if no one is selected do nothing
     }
 }
 
 // If the player has manually selected all of the enemies, show range is flipped to true
 // this is because it is essentially the same as show range and prevents needing a second button push.
-activeEnemies = array_length(oRoomController.enemyChars);
+
 
 if(selectedEnemies = activeEnemies){ 
     show_range = true;
