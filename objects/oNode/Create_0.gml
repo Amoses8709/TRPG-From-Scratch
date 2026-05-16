@@ -1,6 +1,5 @@
 neighbors = [];
 
-
 color = c_white;
 
 occupant = noone;

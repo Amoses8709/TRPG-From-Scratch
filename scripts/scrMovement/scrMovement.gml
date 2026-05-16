@@ -1,7 +1,7 @@
-// _start- the node to pathfind from, _selected - true if node is selected/false if just hovering 
+// _start- the node to pathfind from,_selected - true if node is selected/false if just hovering 
 // _move- the unit on the node's movement range, units remaining actions
-// _allAtk - is this being used to show all active enemy attack ranges
-function scrMovementRange(_start, _selected, _move,_atkRange,_allAtk){
+// _cancel - is this call for the cancel button?
+function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
      // Reset all node data
     scrWipeNodes();
     var _open, _closed; 
@@ -23,7 +23,6 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_allAtk){
         
         //if node was added to open, then it is a viable move node
         _current.moveNode = true;
-        //if the current cost = move its an edge node
         if(_current.G = _move){
             _current.edge = true;
         }
@@ -41,6 +40,7 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_allAtk){
             // neighbor isn't ALREADY on the closed list
             
             //Array contains returns 1 if neighbor is in array or 0 if not in list
+
            
             if(array_contains(_closed, _neighbor) = 0 && _neighbor.walkable &&
             _neighbor.occupant == noone && _neighbor.cost +_current.G <= _move){// + _atkRange){
@@ -75,8 +75,6 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_allAtk){
                }
             }
             
-            // if the neighor isn't walkable, and isn't the start node and the G is less than or equal to move
-            // then this is an edge tile for the walkable range
             if(!_neighbor.walkable && _neighbor != _start && _current.G <= _move ){
                 _current.edge = true;
             }
@@ -101,35 +99,37 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_allAtk){
                     _edgeNeighborX = clamp(_current.gridX+jj,0,oRoomController.columns-1);
                     _edgeNeighborY = clamp(_current.gridY+kk,0,oRoomController.rows-1);
                     _edgeNeighbor = global.nodeMap[_edgeNeighborX,_edgeNeighborY];
-                    //if the abs value of offset > than attack range or the node is a move node
-                    //then we skip making it an attack node 
-                    if(!(abs(jj)+abs(kk)>_atkRange || _edgeNeighbor.moveNode)){
-                        if(_edgeNeighborX=12 && _edgeNeighborY = 8){
-                            var _thing =1;
-                        }
-                        // If the node isn't selected then don't save
-                        if(_edgeNeighbor.walkable){
-                            if(!_selected == true){
-                                _edgeNeighbor.saveNode = false;
-                                if(_allAtk){
-                                    global.enemyAllAttack[_edgeNeighbor.gridX,_edgeNeighbor.gridY].sprite_index = sAllEnemyAttackNode;
-                                    global.enemyAllAttack[_edgeNeighborX,_edgeNeighborY].saveNode = true;
-                                }
-                                else{
-                                    _edgeNeighbor.sprite_dindex = sAttackNode;
-                                    _edgeNeighbor.saveNode = false;
-                                }
+                    if(_edgeNeighbor == global.nodeMap[2,14]){
+                        var _thing =1;
+                    }
+                    //we make it an attack node 
+                    //if the abs value of offset > than attack range 
+                    if(abs(jj)+abs(kk) <= _atkRange){
+                        //and if the node is not a move node
+                        if(_edgeNeighbor.moveNode = false){
+                            if(_edgeNeighbor == global.nodeMap[2,15]){
+                                var _thing =1;
+                            }
+                            //if clearing for the cancel
+                            if(_cancel){
+                               _edgeNeighbor.saveNode = false;
+                               _edgeNeighbor.sprite_index = sDefaultNode;
                             }
                             else{
-                                if(_allAtk){
-                                    global.enemyAllAttack[_edgeNeighborX,_edgeNeighborY].sprite_index = sAllEnemyAttackNode;
-                                    global.enemyAllAttack[_edgeNeighborX,_edgeNeighborY].saveNode = true;
+                                //only color if the neighbor is walkable
+                                if(_edgeNeighbor.walkable){
+                                    // If the node isn't selected then don't save
+                                    if(!_selected == true){
+                                        _edgeNeighbor.saveNode = false;
+                                        _edgeNeighbor.sprite_index = sAttackNode;
+                                    }
+                                    // else the node is selected then we save it
+                                    else{ 
+                                        _edgeNeighbor.sprite_index = sAttackNode;
+                                        _edgeNeighbor.saveNode = true;
+                                    } 
                                 }
-                                else{ 
-                                   _edgeNeighbor.sprite_index = sAttackNode;
-                                   _edgeNeighbor.saveNode = true;
-                                }
-                            } 
+                            }
                         }
                     }
                 }
@@ -141,7 +141,7 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_allAtk){
     for (ii = 0; ii < array_length(_closed); ii++) {
         
         _current = array_get(_closed, ii);
-        scrColorMoveNode(_current, _start.occupant.army, _selected, _move,_current.G,_allAtk);
+        scrColorMoveNode(_current, _start.occupant.army, _selected, _move,_current.G,_cancel);
     }
     
     //scrCreateButtons(_start.occupant);
@@ -150,35 +150,23 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_allAtk){
 
 //node ID to color, Actor's army, is Actor selected, Actor's move, Node's G score. 
 // If G score is greater than move, but still in the array that means its in the attack range
-function scrColorMoveNode(_node, _army,_selected, _move, _cost,_allAtk){
-    //if show range was turned on
-    var _tempGridX = _node.gridX;
-    var _tempGridY = _node.gridY;
-    if(_tempGridX=12 && _tempGridY=8){
-        var thing =1;
+function scrColorMoveNode(_node, _army,_selected, _move, _cost,_cancel){
+    // if cancelling clear stuff
+    if(_cancel){
+        _node.saveNode = false;
+        _node.sprite_index = sDefaultNode;
     }
-    if(_allAtk && oSelector.show_range){ 
-        global.enemyAllAttack[_tempGridX,_tempGridY].sprite_index = sAllEnemyAttackNode;
-        global.enemyAllAttack[_tempGridX,_tempGridY].saveNode = true;
-    }
-    else if(_allAtk && !oSelector.show_range){
-        global.enemyAllAttack[_tempGridX,_tempGridY].sprite_index = sDefaultNode;
-        global.enemyAllAttack[_tempGridX,_tempGridY].saveNode = false;
-    }
-    //Else not invovling show range
-    //Blue army never saves attack nodes
     else{
+        //Blue army never saves attack nodes
         if(_army = BLUEARMY){ 
-            if(_node.moveNode){
-                _node.sprite_index = sMoveNode;
-                _node.saveNode = false;
-            }
-            else if(_node.passable){
-                _node.sprite_index = sAttackNode;
-                _node.saveNode = false;
-            }
-        } 
-            //If red army
+          if(_node.moveNode){
+              _node.sprite_index = sMoveNode;
+          }
+          else if(_node.passable){
+              _node.sprite_index = sAttackNode;
+          }
+        }
+        //If red army
         else{
             if(_selected){
                 _node.sprite_index = sAttackNode;
@@ -188,15 +176,16 @@ function scrColorMoveNode(_node, _army,_selected, _move, _cost,_allAtk){
                   
             } 
             else{
-                if(_cost > _move && _node.walkable){
-                    _node.sprite_index = sAttackNode;
-                    _node.saveNode = false
+               if(_cost > _move && _node.walkable){
+                   _node.sprite_index = sAttackNode;
+                   _node.saveNode = false
                 }
                 else{
-                    _node.sprite_index = sMoveNode;
-                    _node.saveNode = false;
+                   _node.sprite_index = sMoveNode;
+                   _node.saveNode = false;
                 } 
             }
         }
     }
 }
+

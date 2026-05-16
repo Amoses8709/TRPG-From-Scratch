@@ -32,7 +32,6 @@ move_path  = path_add();
 
 //  Create map array for tracking occupants, nodes, and neighbors
 global.nodeMap = [];
-global.enemyAllAttack = [];
 
 // Populate mp_grid with the collision tilemap
 for (var _c = 0; _c < columns; _c++){
@@ -40,20 +39,13 @@ for (var _c = 0; _c < columns; _c++){
         mp_grid_add_cell(grid_id, _c, _r);
         
         global.nodeMap[_c,_r] = instance_create_layer(_c * GRIDSIZE, _r * GRIDSIZE, "Instances", oNode); 
-        global.enemyAllAttack[_c,_r] = instance_create_layer(_c * GRIDSIZE, _r * GRIDSIZE, "AllEnemyAttackRange", oNode_Enemy); 
         global.nodeMap[_c,_r].gridX = _c;
-        global.enemyAllAttack[_c,_r].gridX = _c;
         global.nodeMap[_c,_r].gridY = _r;   
-        global.enemyAllAttack[_c,_r].gridY = _r;
         if(collision(_c,_r,"Env")){
              global.nodeMap[_c,_r].walkable = false;
         }
     }
 }
-var _layer_id = layer_get_id("AllEnemyAttackRange");
-var _elements = layer_get_all_elements(_layer_id);
-
-
 
 // Adds collision objects to MP Grid
 mp_grid_add_instances(grid_id, oCollision, false);

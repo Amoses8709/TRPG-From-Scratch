@@ -5,8 +5,8 @@ gridY = 0;
 sWidth = 2;
 sHeight = oRoomController.maxEnemies+oRoomController.maxHeroes;
 
-selected [sHeight-1][0] = noone; // selected Actor
-selected [sHeight-1][1] = noone; // selected Node
+selected [sHeight-1][0] = noone; // Selected Actor
+selected [sHeight-1][1] = noone; // Selected Node
 var jj = 0;
 with(oEnemyChar){
     oSelector.selected[jj][0] = id;
@@ -19,16 +19,13 @@ with(oHeroChar){
     jj+=1;
 }
 
-
 selectorPaused = false;
 hoverNode = noone;
 noOneSelected = true;
 show_range = false;
 
 selectedEnemies = 0;
-heroSelected = false;
-selectedHero = noone;
-heroIndex = pointer_null;
+selectedHero = false;
 activeEnemies = 0;
 
 //moving = false;
