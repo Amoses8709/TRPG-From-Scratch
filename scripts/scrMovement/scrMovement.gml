@@ -99,7 +99,7 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
                     _edgeNeighborX = clamp(_current.gridX+jj,0,oRoomController.columns-1);
                     _edgeNeighborY = clamp(_current.gridY+kk,0,oRoomController.rows-1);
                     _edgeNeighbor = global.nodeMap[_edgeNeighborX,_edgeNeighborY];
-                    if(_edgeNeighbor == global.nodeMap[2,14]){
+                    if(_edgeNeighbor == global.nodeMap[10,6]){
                         var _thing =1;
                     }
                     //we make it an attack node 
@@ -107,9 +107,9 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
                     if(abs(jj)+abs(kk) <= _atkRange){
                         //and if the node is not a move node
                         if(_edgeNeighbor.moveNode = false){
-                            if(_edgeNeighbor == global.nodeMap[2,15]){
-                                var _thing =1;
-                            }
+                            //if(_edgeNeighbor == global.nodeMap[2,15]){
+                                //var _thing =1;
+                            //}
                             //if clearing for the cancel
                             if(_cancel){
                                _edgeNeighbor.saveNode = false;
@@ -176,7 +176,7 @@ function scrColorMoveNode(_node, _army,_selected, _move, _cost,_cancel){
                   
             } 
             else{
-               if(_cost > _move && _node.walkable){
+                if(_cost > _move && _node.walkable){
                    _node.sprite_index = sAttackNode;
                    _node.saveNode = false
                 }

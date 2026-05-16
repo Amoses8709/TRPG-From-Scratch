@@ -25,7 +25,9 @@ noOneSelected = true;
 show_range = false;
 
 selectedEnemies = 0;
-selectedHero = false;
+heroSelected = false;
+selectedHero = noone;
+heroIndex = pointer_null;
 activeEnemies = 0;
 
 //moving = false;
