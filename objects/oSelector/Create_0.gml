@@ -21,14 +21,16 @@ with(oHeroChar){
 
 selectorPaused = false;
 hoverNode = noone;
-noOneSelected = true;
 show_range = false;
+deselectedX = pointer_null;
+deselectedY = pointer_null;
 
 selectedEnemies = 0;
 heroSelected = false;
 selectedHero = noone;
+deselectedEnemy = noone;
 heroIndex = pointer_null;
 activeEnemies = 0;
 
 //moving = false;
-alarmPause = 10
+alarmPause = 10;
