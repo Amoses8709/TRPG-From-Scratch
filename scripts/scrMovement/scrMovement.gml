@@ -34,47 +34,52 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
             // store current neighbor in neighbor variable
             _neighbor = array_get(_current.neighbors, ii);
             
-            // add neighbor to open list if it qualifies
-            // neighbor is walkable, neighbor has no occupant
-            // neighbor projected G score is less than movement range
+            // add neighbor to open list if it qualifies\
             // neighbor isn't ALREADY on the closed list
-            
+            // neighbor projected G score is less than movement range
+            // neighbor is noObject, neighbor has no occupant
             //Array contains returns 1 if neighbor is in array or 0 if not in list
 
-            if(array_contains(_closed, _neighbor) = 0 && _neighbor.walkable &&
-            _neighbor.occupant == noone && _neighbor.cost +_current.G <= _move){// + _atkRange){
+            //if(array_contains(_closed, _neighbor) = 0 && _neighbor.cost +_current.G <= _move){
+                //if((_neighbor.noObject && _neighbor.occupant == noone) || 
+                    //(_neighbor.occupant != noone && _neighbor.occupant.army =_start.occupant.army)){
             
-                // only calculate a new G score for neighbor if is hasn't been calculated
-                if (ds_priority_find_priority(_open, _neighbor) == 0 ||  ds_priority_find_priority(_open, _neighbor)== undefined) {
-                   
-                   // give neighbor the appropiate parent
-                   _neighbor.parent = _current;
-                   
-                   // calculate G score of neighbor
-                   _neighbor.G = _current.G + _neighbor.cost;
-                   
-                   // add neighbor to the open list so it can be checked out too
-                   ds_priority_add(_open, _neighbor, _neighbor.G);
-                   }
-               
-                // else if neighbor's score has already been calculated for the open list
-                else {
-                   // figure out if the neighbor's score would be LOWER if found from the current node
-                   
-                   _tempG = _current.G + _neighbor.cost;
-                   
-                   // check if G score would be lower 
-                   if (_tempG < _neighbor.G) {
-                       _neighbor.parent = _current;
-                       _neighbor.G = _tempG;
-                       ds_priority_change_priority(_open, _neighbor, _neighbor.G);
+            
+            if(array_contains(_closed, _neighbor) = 0 && _neighbor.noObject && _neighbor.cost +_current.G <= _move &&
+            (_neighbor.occupant == noone || (_neighbor.occupant != noone && _neighbor.occupant.army = _start.occupant.army))){// + _atkRange){    
+                
+                    // only calculate a new G score for neighbor if is hasn't been calculated
+                    if (ds_priority_find_priority(_open, _neighbor) == 0 ||  ds_priority_find_priority(_open, _neighbor)== undefined) {
                        
-                   }
+                       // give neighbor the appropiate parent
+                       _neighbor.parent = _current;
+                       
+                       // calculate G score of neighbor
+                       _neighbor.G = _current.G + _neighbor.cost;
+                       
+                       // add neighbor to the open list so it can be checked out too
+                       ds_priority_add(_open, _neighbor, _neighbor.G);
+                    }
                    
-               }
+                    // else if neighbor's score has already been calculated for the open list
+                    else {
+                        // figure out if the neighbor's score would be LOWER if found from the current node
+                       
+                        _tempG = _current.G + _neighbor.cost;
+                       
+                        // check if G score would be lower 
+                        if (_tempG < _neighbor.G) {
+                           _neighbor.parent = _current;
+                           _neighbor.G = _tempG;
+                           ds_priority_change_priority(_open, _neighbor, _neighbor.G);
+                           
+                        }
+                       
+                    }
+                                
             }
             
-            if(!_neighbor.walkable && _neighbor != _start && _current.G <= _move ){
+            if(!_neighbor.noObject && _neighbor != _start && _current.G <= _move ){
                 _current.edge = true;
             }
         }
@@ -91,32 +96,34 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
         var _edgeNeighborY = 0;
         var _edgeNeighbor = noone;
         _current = array_get(_closed, ii);
+        //if the current node is an edge node
         if(_current.edge){
+            //check all possible ranges within the attack range
             for(jj = -_atkRange; jj<= _atkRange; jj++){
                 for(kk = -_atkRange; kk <= _atkRange; kk++){
                     
                     _edgeNeighborX = clamp(_current.gridX+jj,0,oRoomController.columns-1);
                     _edgeNeighborY = clamp(_current.gridY+kk,0,oRoomController.rows-1);
                     _edgeNeighbor = global.nodeMap[_edgeNeighborX,_edgeNeighborY];
-                    if(_edgeNeighbor == global.nodeMap[3,6]){
-                        var _thing =1;
-                    }
+                    //if(_edgeNeighbor == global.nodeMap[3,6]){
+                        //var _thing =1;
+                    //}
                     //we make it an attack node 
                     //if the abs value of offset > than attack range 
                     if(abs(jj)+abs(kk) <= _atkRange){
-                        //and if the node is not a move node
+                        //Excluding nodes that are move nodes
                         if(array_contains(_closed, _edgeNeighbor) = 0){
-                            if(_edgeNeighbor == global.nodeMap[3,6]){
-                                var _thing =1;
-                            }
+                            //if(_edgeNeighbor == global.nodeMap[3,6]){
+                                //var _thing =1;
+                            //}
                             //if clearing for the cancel
                             if(_cancel){
                                _edgeNeighbor.saveNode = false;
                                _edgeNeighbor.sprite_index = sDefaultNode;
                             }
                             else{
-                                //only color if the neighbor is walkable
-                                if(_edgeNeighbor.walkable){
+                                //only color if the neighbor is noObject
+                                if(_edgeNeighbor.noObject || _edgeNeighbor.occupant != noone){
                                     // If the node isn't selected then don't save
                                     if(!_selected == true){
                                         _edgeNeighbor.saveNode = false;
@@ -178,7 +185,7 @@ function scrColorMoveNode(_node, _army,_selected, _move, _cost,_cancel){
                   
             } 
             else{
-                if(_cost > _move && _node.walkable){
+                if(_cost > _move && _node.noObject){
                    _node.sprite_index = sAttackNode;
                    _node.saveNode = false
                 }

@@ -5,6 +5,6 @@
 //draw_set_colour(c_white);
 //draw_text(x+33, 0, _tempTitle);
 //draw_self();
-scrDebugTextbox(oSelector);
+//scrDebugTextbox(oSelector);
 draw_self();
 
