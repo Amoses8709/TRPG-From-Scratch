@@ -41,7 +41,6 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
             
             //Array contains returns 1 if neighbor is in array or 0 if not in list
 
-           
             if(array_contains(_closed, _neighbor) = 0 && _neighbor.walkable &&
             _neighbor.occupant == noone && _neighbor.cost +_current.G <= _move){// + _atkRange){
             
@@ -99,17 +98,17 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
                     _edgeNeighborX = clamp(_current.gridX+jj,0,oRoomController.columns-1);
                     _edgeNeighborY = clamp(_current.gridY+kk,0,oRoomController.rows-1);
                     _edgeNeighbor = global.nodeMap[_edgeNeighborX,_edgeNeighborY];
-                    if(_edgeNeighbor == global.nodeMap[10,6]){
+                    if(_edgeNeighbor == global.nodeMap[3,6]){
                         var _thing =1;
                     }
                     //we make it an attack node 
                     //if the abs value of offset > than attack range 
                     if(abs(jj)+abs(kk) <= _atkRange){
                         //and if the node is not a move node
-                        if(_edgeNeighbor.moveNode = false){
-                            //if(_edgeNeighbor == global.nodeMap[2,15]){
-                                //var _thing =1;
-                            //}
+                        if(array_contains(_closed, _edgeNeighbor) = 0){
+                            if(_edgeNeighbor == global.nodeMap[3,6]){
+                                var _thing =1;
+                            }
                             //if clearing for the cancel
                             if(_cancel){
                                _edgeNeighbor.saveNode = false;
@@ -151,6 +150,9 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
 //node ID to color, Actor's army, is Actor selected, Actor's move, Node's G score. 
 // If G score is greater than move, but still in the array that means its in the attack range
 function scrColorMoveNode(_node, _army,_selected, _move, _cost,_cancel){
+    if(_node == global.nodeMap[3,6]){
+                        var _thing =1;
+                    }
     // if cancelling clear stuff
     if(_cancel){
         _node.saveNode = false;

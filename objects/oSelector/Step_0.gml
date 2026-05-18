@@ -150,6 +150,7 @@ if(!selectorPaused){
                             }
                             
                         }
+                        
                         if(selected[aa][1]!=noone){
                             if(selected[aa][0].army = REDARMY){
                                 scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false);
@@ -201,24 +202,16 @@ if(!selectorPaused){
     
     if(InputCheck(INPUT_VERB.CANCEL)){
         
-        // if there is an actor selected
-        if(selectedEnemies+heroSelected > 0){
-            // then loop through selected array 
-            for(aa=0;aa<sHeight;aa++){
-                //and find blue actor with non-noone node
-                if(selected[aa][1] != noone){
-                    if(selected[aa][0].army = BLUEARMY){
-                        //then redraw range as not selected, so it can be wiped
-                        
-                        scrMovementRange(selected[aa][1], false, selected[aa][0].move, selected[aa][0].attackRange,true);
-                        selected[aa][1]= noone;
-                        selected[aa][0].selected = false;
-                        heroSelected = false;
-                        selectedHero = noone;
-                        heroIndex = pointer_null;
-                    }
-                }
-            }
+        // if there is a hero selected
+        if(heroSelected){
+            //and then deselect them
+            selected[heroIndex][0].selected = false
+            //then redraw range as not selected, so it can be wiped
+            scrMovementRange(selected[heroIndex][1], selected[heroIndex][0].selected, selected[heroIndex][0].move, selected[heroIndex][0].attackRange,true);
+            selected[heroIndex][1]= noone;
+            heroSelected = false;
+            selectedHero = noone;
+            heroIndex = pointer_null;
         }
         //else if no one is selected do nothing
         selectorPaused = true;
@@ -245,7 +238,7 @@ if(!selectorPaused){
         //alarm[0] = alarmPause; 
     }
     
-    //Handles hovering and no button pushes.
+    //Handles hovering
     
     // If there is directional input
     if (inputX!=0||inputY!=0){
@@ -261,45 +254,40 @@ if(!selectorPaused){
     hoverNode = global.nodeMap[gridX,gridY];
     hoverNode.occupant = global.nodeMap[gridX,gridY].occupant;
     
+    
+    
     //Hovering treats red and blue army the same
     // If hovernode is occupied 
     if(hoverNode.occupant != noone){
-        // And there are no selected actors, draw occupants range
-        if(selectedEnemies+heroSelected=0){
+        //redraw selected actors' ranges
+        for(aa=0;aa<sHeight;aa++){
+            if(selected[aa][1] != noone){
+                scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false)
+            }
+        }
+        if(heroSelected == false){
+            //then draw hover occupants range on top
             scrMovementRange(hoverNode,false, hoverNode.occupant.move, hoverNode.occupant.attackRange,false);    
         }
-        //else someone is selected
-        else {
-            //if(deselectedX != pointer_null){
-                //var _tempNode = global.nodeMap[deselectedX,deselectedY]
-                //scrMovementRange(_tempNode, false, _tempNode.occupant.move, _tempNode.occupant.attackRange,false);
-                //deselectedX= pointer_null;
-                //deselectedY= pointer_null;
-                //scrWipeNodes(); 
-            //}
-            //loop through selected array and find matching id
-            //for(aa=0;aa<sHeight;aa++){
-                ////if hovernode is occupied, by a selected actor
-                //if(hoverNode.occupant == selected[aa][0]){
-                    //hoverNode.occupant.selected=true
-                    //scrMovementRange(hoverNode,true, hoverNode.occupant.move, hoverNode.occupant.attackRange,false);    
-                //}
-            //}
-        } 
-        //else the hovernode is occupied, but not by any selected actors so do nothing
     } 
     // If hovernode isn't occupied
     else{
-        //And there are no selected actors wipe nodes
-        if(selectedEnemies+heroSelected =0){
+        // if there are no selected actors selected 
+        //if(selectedEnemies+heroSelected=0){
             scrWipeNodes(); 
-        }
+        //}
+        //else{
+            //redraw selected actors' ranges
+            for(aa=0;aa<sHeight;aa++){
+                if(selected[aa][1] != noone){
+                   scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false)
+                }
+            }
+        //}
     }   
     
     inputX=0;
     inputY=0;
-    //selectorPaused = true;
-    //alarm[0] = alarmPause;
 }
 
 // If the player has manually selected all of the enemies, show range is flipped to true
