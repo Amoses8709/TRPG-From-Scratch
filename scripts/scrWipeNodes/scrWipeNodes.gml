@@ -1,12 +1,13 @@
-function scrWipeNodes(){
-    //reset data of ALL nodes
+function scrWipeNodes(_forceClear = false){
+    // Always reset pathfinding state; only preserve sprites when saveNode is set
     with(oNode){
-        if(!saveNode){
-            moveNode=false;
-            attackNode = false;
-            edge = false;
-            G=0;  
-            parent = noone;
+        moveNode = false;
+        attackNode = false;
+        edge = false;
+        G = 0;
+        parent = noone;
+        if (_forceClear || !saveNode) {
+            saveNode = false;
             color = c_white;
             sprite_index = sDefaultNode;
         }

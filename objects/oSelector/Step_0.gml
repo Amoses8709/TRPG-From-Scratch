@@ -18,37 +18,35 @@ if(!selectorPaused){
             selectedEnemies=0;
         }
         
-        with(oNode){ 
-            // If show range was just turned on show_range = true now
-            //Go through and check all node occupants
-            for(aa=0;aa<other.sHeight;aa++){
-                // if the node is occupied
+        if(show_range) {
+            with(oNode){ 
                 if(occupant != noone){
-                    //and the occupant matches the current actor
-                    if(other.selected[aa][0] = occupant){
-                        //and show range is on and occupant is red army
-                        if(other.show_range && occupant.army = REDARMY){
-                            //set them to selected
+                    for(aa=0;aa<other.sHeight;aa++){
+                        if(other.selected[aa][0] = occupant && occupant.army = REDARMY){
                             other.selected[aa][0].selected = true;
                             other.selected[aa][1] = self;
-                            scrMovementRange(id, occupant.selected, occupant.move, occupant.attackRange,false);
                         }
-                        // else if show range is off and occupant is red army
-                        else if(!other.show_range && occupant.army = REDARMY){
-                            //unselect them
+                    }
+                }
+            }
+            scrRedrawAllRanges(noone);
+        }
+        else {
+            with(oNode){ 
+                if(occupant != noone){
+                    for(aa=0;aa<other.sHeight;aa++){
+                        if(other.selected[aa][0] = occupant && occupant.army = REDARMY){
                             other.selected[aa][0].selected = false;
-                            scrMovementRange(id, other.selected[aa][0].selected, occupant.move, occupant.attackRange,false);
                             other.selected[aa][1] = noone;
                         }
                     }
-                    
                 }
             }
+            scrWipeNodes(true);
         }
         
         selectorPaused = true;
         alarm[0] = alarmPause; 
-        scrWipeNodes();
         exit;   
     }
          
@@ -73,7 +71,6 @@ if(!selectorPaused){
                     else {
                         selectedEnemies +=1;
                     }
-                    scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false); 
                 }
             }
              
@@ -106,13 +103,12 @@ if(!selectorPaused){
                             if(selected[aa][1]!=noone){
                                 deselectedEnemy = global.nodeMap[gridX,gridY].occupant;
                                 global.nodeMap[gridX,gridY].occupant.selected = false;
-                                scrMovementRange(selected[aa][1], false, selected[aa][0].move, selected[aa][0].attackRange,false);
                                 if(global.nodeMap[gridX,gridY].occupant.army = REDARMY){
                                     selectedEnemies -=1;
                                     show_range = false; 
                                 }
                                 selected[aa][1] = noone;
-                                scrWipeNodes();
+                                scrWipeNodes(true);
                                 //Stops looking for the selected actor to deselect
                                 break;
                             }
@@ -151,14 +147,6 @@ if(!selectorPaused){
                             
                         }
                         
-                        if(selected[aa][1]!=noone){
-                            if(selected[aa][0].army = REDARMY){
-                                scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false);
-                            } 
-                            else{
-                                scrMovementRange(selected[aa][1], false, selected[aa][0].move, selected[aa][0].attackRange,false);
-                            } 
-                        }          
                         // If the occupant isn't the actor who was just deselected
                         if(global.nodeMap[gridX,gridY].occupant != deselectedEnemy){
                             // If the occupant matches the selected Actor
@@ -167,25 +155,21 @@ if(!selectorPaused){
                                 if(selected[aa][1]==noone){ 
                                     global.nodeMap[gridX,gridY].occupant.selected = true;
                                     selected[aa][1] = global.nodeMap[gridX,gridY];
-                                    scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false);
                                     
                                     //if the newly selected actor is red army
                                     if(selected[aa][0].army = REDARMY){
-                                        selectedEnemies +=1; 
+                                        selectedEnemies +=1;
                                     }
                                     //if the newly selected actor is blue army
                                     else{
                                         heroSelected = true;
                                         selectedHero = selected[aa][0];
                                         heroIndex = aa;
-                                        scrMovementRange(selected[aa][1], false, selected[aa][0].move, selected[aa][0].attackRange,false);
                                     }
                                 }
                                //for selected actors who aren't the occupant
                                else if(selected[aa][1] != noone){
-                                   if(global.nodeMap[gridX,gridY].occupant != deselectedEnemy){
-                                       scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false)
-                                   }
+                                   // ranges redrawn at end of step via scrRedrawAllRanges
                                }
                             }
                         }
@@ -206,12 +190,11 @@ if(!selectorPaused){
         if(heroSelected){
             //and then deselect them
             selected[heroIndex][0].selected = false
-            //then redraw range as not selected, so it can be wiped
-            scrMovementRange(selected[heroIndex][1], selected[heroIndex][0].selected, selected[heroIndex][0].move, selected[heroIndex][0].attackRange,true);
             selected[heroIndex][1]= noone;
             heroSelected = false;
             selectedHero = noone;
             heroIndex = pointer_null;
+            scrRedrawAllRanges(noone);
         }
         //else if no one is selected do nothing
         selectorPaused = true;
@@ -256,35 +239,8 @@ if(!selectorPaused){
     
     
     
-    //Hovering treats red and blue army the same
-    // If hovernode is occupied 
-    if(hoverNode.occupant != noone){
-        //redraw selected actors' ranges
-        for(aa=0;aa<sHeight;aa++){
-            if(selected[aa][1] != noone){
-                scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false)
-            }
-        }
-        if(heroSelected == false){
-            //then draw hover occupants range on top
-            scrMovementRange(hoverNode,false, hoverNode.occupant.move, hoverNode.occupant.attackRange,false);    
-        }
-    } 
-    // If hovernode isn't occupied
-    else{
-        // if there are no selected actors selected 
-        //if(selectedEnemies+heroSelected=0){
-            scrWipeNodes(); 
-        //}
-        //else{
-            //redraw selected actors' ranges
-            for(aa=0;aa<sHeight;aa++){
-                if(selected[aa][1] != noone){
-                   scrMovementRange(selected[aa][1], selected[aa][0].selected, selected[aa][0].move, selected[aa][0].attackRange,false)
-                }
-            }
-        //}
-    }   
+    // Enemies drawn first, hero (green) drawn on top when selected
+    scrRedrawAllRanges(hoverNode);
     
     inputX=0;
     inputY=0;

@@ -36,7 +36,9 @@ global.nodeMap = [];
 // Populate mp_grid with the collision tilemap
 for (var _c = 0; _c < columns; _c++){
 	for (var _r = 0; _r < rows; _r++){
-        mp_grid_add_cell(grid_id, _c, _r);
+        if (tilemap_get(tile_id, _c, _r)){
+            mp_grid_add_cell(grid_id, _c, _r);
+        }
         
         global.nodeMap[_c,_r] = instance_create_layer(_c * GRIDSIZE, _r * GRIDSIZE, "Instances", oNode); 
         global.nodeMap[_c,_r].gridX = _c;
