@@ -14,6 +14,7 @@ debug= false;
 parent = noone;
 G = 0;
 moveNode = false;
+allyPassNode = false;
 attackNode = false;
 saveNode = false;
 cost = 1;

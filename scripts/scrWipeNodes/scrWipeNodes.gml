@@ -2,6 +2,7 @@ function scrWipeNodes(_forceClear = false){
     // Always reset pathfinding state; only preserve sprites when saveNode is set
     with(oNode){
         moveNode = false;
+        allyPassNode = false;
         attackNode = false;
         edge = false;
         G = 0;

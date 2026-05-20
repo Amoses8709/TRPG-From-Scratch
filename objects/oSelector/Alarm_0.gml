@@ -1,1 +1,3 @@
-selectorPaused = false;
+if (!heroMoving) {
+    selectorPaused = false;
+}

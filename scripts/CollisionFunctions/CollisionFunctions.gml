@@ -9,10 +9,10 @@ function collision(tileX,tileY,type){
     var _roomX = to_room(tileX+0.5);
     var _roomY = to_room(tileY+0.5);
     
-    if(type="Env" || type == "All"){
+    if(type == "Env" || type == "All"){
         if (position_meeting(_roomX, _roomY, oCollision)) return true;
     }
-    if(type="Actor" || type == "All"){    
+    if(type == "Actor" || type == "All"){    
         if (position_meeting(_roomX, _roomY, oActor)) return true;
     }    
     return false;

@@ -1,6 +1,13 @@
 activeEnemies = array_length(oRoomController.enemyChars);
 
 if(!selectorPaused){
+    if(heroMoving){
+        if(InputCheck(INPUT_VERB.CANCEL)){
+            scrHeroCancelMove();
+            scrRedrawAllRanges(noone);
+        }
+        exit;
+    }
     if(InputCheck(INPUT_VERB.PAUSE)){
         // Main menu tbd
         selectorPaused = true;
@@ -12,7 +19,7 @@ if(!selectorPaused){
         show_range = !show_range;
         
         if(show_range) {
-            selectedEnemies = array_length(oRoomController.enemyChars);
+            selectedEnemies = activeEnemies;
         }
         else{
             selectedEnemies=0;
@@ -50,8 +57,21 @@ if(!selectorPaused){
         exit;   
     }
          
+    // Hero: confirm move to highlighted tile
+    if(InputCheck(INPUT_VERB.ACCEPT) && heroSelected){
+        var _targetNode = global.nodeMap[gridX, gridY];
+        if(scrIsValidHeroMoveDest(gridX, gridY, selected[heroIndex][1])
+            && (gridX != selectedHero.gridX || gridY != selectedHero.gridY)){
+            scrHeroCommitMove(_targetNode);
+            selectorPaused = true;
+            alarm[0] = alarmPause;
+            exit;
+        }
+        selectorPaused = true;
+        alarm[0] = alarmPause;
+    }
     // Selecting a non-empty hovered over node
-    if((InputCheck(INPUT_VERB.ACCEPT) && global.nodeMap[gridX,gridY].occupant != noone)){
+    else if((InputCheck(INPUT_VERB.ACCEPT) && global.nodeMap[gridX,gridY].occupant != noone)){
         
         // if there are no selected actors selected 
         if(selectedEnemies+heroSelected=0){
@@ -62,14 +82,16 @@ if(!selectorPaused){
                     selected[aa][1] = global.nodeMap[gridX,gridY]; // SelectedNode
                     selected[aa][0].selected = true; 
                     //if the newly selected actor is a hero
-                    if(selected[aa][0].army =BLUEARMY){
-                        selectedHero = selected[aa][0]
-                        heroIndex=aa;
-                        heroSelected = true;
+                    if(selected[aa][0].army == BLUEARMY){
+                        scrSelectorBeginHero(selected[aa][0], aa, global.nodeMap[gridX, gridY]);
                     }
                     //if the newly selected actor is an enemy
                     else {
                         selectedEnemies +=1;
+                        if(selectedEnemies == activeEnemies){
+                            show_range = true;
+                        }
+                        
                     }
                 }
             }
@@ -135,12 +157,13 @@ if(!selectorPaused){
                                     //if the newly selected actor is red army
                                     if(selected[aa][0].army = REDARMY){
                                         selectedEnemies +=1; 
+                                        if(selectedEnemies == activeEnemies){
+                                            show_range = true;
+                                        }
                                     }
                                     //if the newly selected actor is blue army
                                     else{
-                                        heroSelected = true;
-                                        selectedHero = selected[aa][0];
-                                        heroIndex = aa;
+                                        scrSelectorBeginHero(selected[aa][0], aa, global.nodeMap[gridX, gridY]);
                                     }
                                 }
                             }
@@ -159,12 +182,13 @@ if(!selectorPaused){
                                     //if the newly selected actor is red army
                                     if(selected[aa][0].army = REDARMY){
                                         selectedEnemies +=1;
+                                        if(selectedEnemies == activeEnemies){
+                                            show_range = true;
+                                        }
                                     }
                                     //if the newly selected actor is blue army
                                     else{
-                                        heroSelected = true;
-                                        selectedHero = selected[aa][0];
-                                        heroIndex = aa;
+                                        scrSelectorBeginHero(selected[aa][0], aa, global.nodeMap[gridX, gridY]);
                                     }
                                 }
                                //for selected actors who aren't the occupant
@@ -188,13 +212,18 @@ if(!selectorPaused){
         
         // if there is a hero selected
         if(heroSelected){
-            //and then deselect them
-            selected[heroIndex][0].selected = false
-            selected[heroIndex][1]= noone;
-            heroSelected = false;
-            selectedHero = noone;
-            heroIndex = pointer_null;
-            scrRedrawAllRanges(noone);
+            if(heroMoveCommitted){
+                scrHeroUndoMove();
+                scrRedrawAllRanges(noone);
+            }
+            else{
+                selected[heroIndex][0].selected = false;
+                selected[heroIndex][1] = noone;
+                heroSelected = false;
+                selectedHero = noone;
+                heroIndex = pointer_null;
+                scrRedrawAllRanges(noone);
+            }
         }
         //else if no one is selected do nothing
         selectorPaused = true;
@@ -225,11 +254,8 @@ if(!selectorPaused){
     
     // If there is directional input
     if (inputX!=0||inputY!=0){
-        
-        //show_message(string(oRoomController.columns)+" : "+string(oRoomController.rows));
-        gridX = clamp(gridX+inputX,0,oRoomController.columns-1);
-        gridY = clamp(gridY+inputY,0,oRoomController.rows-1);
-        
+        gridX = clamp(gridX + inputX, 0, oRoomController.columns - 1);
+        gridY = clamp(gridY + inputY, 0, oRoomController.rows - 1);
     }
     
     x= gridX * GRIDSIZE;
@@ -250,7 +276,7 @@ if(!selectorPaused){
 // this is because it is essentially the same as show range and prevents needing a second button push.
 
 
-if(selectedEnemies = activeEnemies){ 
+if(selectedEnemies == activeEnemies){ 
     show_range = true;
 }
 deselectedEnemy = noone;

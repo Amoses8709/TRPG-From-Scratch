@@ -8,3 +8,26 @@
 //scrDebugTextbox(oSelector);
 draw_self();
 
+if (heroSelected && selectedHero != noone && !heroMoving) {
+    if (gridX != selectedHero.gridX || gridY != selectedHero.gridY) {
+        var _startNode = selected[heroIndex][1];
+        if (_startNode != noone) {
+            var _endNode = global.nodeMap[gridX, gridY];
+            var _arrowColour = c_yellow;
+            
+            if (scrIsValidHeroMoveDest(gridX, gridY, _startNode)){
+                gpu_set_depth(0);
+                scrDrawHeroMovePreview(_startNode, _endNode, _arrowColour);
+            }
+            else{
+                if (_endNode.occupant != noone) {
+                    if (_endNode.occupant.army == BLUEARMY) {
+                        gpu_set_depth(0);
+                        scrDrawHeroMovePreview(_startNode, _endNode, _arrowColour);
+                    }
+                }
+            }
+            
+        }
+    }
+}

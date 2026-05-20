@@ -1,3 +1,4 @@
+depth = -10;
 army = BLUEARMY;
 name = "John Doe";
 
@@ -15,6 +16,8 @@ selected = false;
 movePath = path_add();
 path_set_kind(movePath,2); // 2 is straight lines and hits all points, 1 is wavy and doesn't full hit all points
 path_set_closed(movePath, false); // If true would return to start point, potentially good for patrols
+isMoving = false;
+moveSpeed = 8;
 
 attackTarget = noone;
 

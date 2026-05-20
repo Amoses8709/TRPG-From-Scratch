@@ -1,9 +1,16 @@
 // _start- the node to pathfind from,_selected - true if node is selected/false if just hovering 
 // _move- the unit on the node's movement range, units remaining actions
 // _cancel - is this call for the cancel button?
-function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
+function scrMovementRange(_start, _selected, _move,_atkRange,_cancel, _actor = undefined){
      // Reset node data; full clear only when cancelling (layered draws use scrRedrawAllRanges)
-    var _army = _start.occupant.army;
+    var _unit = _actor;
+    if (is_undefined(_unit) || !instance_exists(_unit)) {
+        _unit = _start.occupant;
+    }
+    if (!instance_exists(_unit)) {
+        return;
+    }
+    var _army = _unit.army;
     scrWipeNodes(_cancel);
     var _open, _closed; 
     var _current, _neighbor; 
@@ -24,8 +31,9 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
         // remove node with the lowest G score from open
         _current = ds_priority_delete_min(_open);
         
-        // Valid destinations: empty tiles and the unit's start tile (allies are pass-through only)
+        // Valid destinations: empty tiles and start tile; allies are pass-through (shown green, not stoppable)
         _current.moveNode = (_current == _start || _current.occupant == noone);
+        _current.allyPassNode = (_current.occupant != noone && _current.occupant.army == _army && _current != _start);
         if(_current.G == _move){
             _current.edge = true;
         }
@@ -37,50 +45,31 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
             // store current neighbor in neighbor variable
             _neighbor = array_get(_current.neighbors, ii);
 
-            // add neighbor to open list if it qualifies\
-            // neighbor isn't ALREADY on the closed list
-            // neighbor projected G score is less than movement range
-            // Walkable: open terrain, empty tile, or same-army ally (pass through; cannot stop on ally)
-            // Array contains returns 1 if neighbor is in array or 0 if not in list
-            _walkable = _neighbor.noObject && (
-                _neighbor.occupant == noone
-                || _neighbor.occupant.army == _army
-            );
-            if(!array_contains(_closed, _neighbor) && _neighbor.cost + _current.G <= _move && _walkable){
-                    // only calculate a new G score for neighbor if is hasn't been calculated
-                    if (ds_priority_find_priority(_open, _neighbor) == 0 ||  ds_priority_find_priority(_open, _neighbor)== undefined) {
-                       
-                       // give neighbor the appropiate parent
-                       _neighbor.parent = _current;
-                       
-                       // calculate G score of neighbor
-                       _neighbor.G = _current.G + _neighbor.cost;
-                       
-                       // add neighbor to the open list so it can be checked out too
-                       ds_priority_add(_open, _neighbor, _neighbor.G);
-                    }
-                   
-                    // else if neighbor's score has already been calculated for the open list
-                    else {
-                        // figure out if the neighbor's score would be LOWER if found from the current node
-                       
-                        _tempG = _current.G + _neighbor.cost;
-                       
-                        // check if G score would be lower 
-                        if (_tempG < _neighbor.G) {
-                           _neighbor.parent = _current;
-                           _neighbor.G = _tempG;
-                           ds_priority_change_priority(_open, _neighbor, _neighbor.G);
-                           
-                        }
-                       
-                    }
-                
-                                
+            // Walls block; empty or same-army ally tiles can be entered (allies are pass-through only)
+            if (!_neighbor.noObject) {
+                if (_neighbor != _start && _current.G <= _move) {
+                    _current.edge = true;
+                }
+                continue;
             }
-             
-            if(!_neighbor.noObject && _neighbor != _start && _current.G <= _move ){
-                _current.edge = true;
+            if (_neighbor.occupant != noone && _neighbor.occupant.army != _army) {
+                continue;
+            }
+
+            _tempG = _current.G + _neighbor.cost;
+
+            if (!array_contains(_closed, _neighbor) && _tempG <= _move) {
+                var _openPri = ds_priority_find_priority(_open, _neighbor);
+                if (_openPri == undefined) {
+                    _neighbor.parent = _current;
+                    _neighbor.G = _tempG;
+                    ds_priority_add(_open, _neighbor, _neighbor.G);
+                }
+                else if (_tempG < _neighbor.G) {
+                    _neighbor.parent = _current;
+                    _neighbor.G = _tempG;
+                    ds_priority_change_priority(_open, _neighbor, _neighbor.G);
+                }
             }
         }
         
@@ -143,11 +132,11 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
         }
     }    
 
-    // color all the move nodes (skip ally pass-through tiles)
+    // color move tiles and ally pass-through tiles
     for (ii = 0; ii < array_length(_closed); ii++) {
         
         _current = array_get(_closed, ii);
-        if (_current.moveNode) {
+        if (_current.moveNode || _current.allyPassNode) {
             scrColorMoveNode(_current, _army, _selected, _move,_current.G,_cancel);
         }
     }
@@ -159,6 +148,9 @@ function scrMovementRange(_start, _selected, _move,_atkRange,_cancel){
 /// Redraws movement/attack overlays: selected enemies first, hero on top when active.
 /// @param {Struct} _hoverNode  Node under cursor (noone to skip hover layer)
 function scrRedrawAllRanges(_hoverNode) {
+    if (oSelector.heroMoving) {
+        return;
+    }
     scrWipeNodes(true);
     
     // Only selected enemies (not every enemy on the field)
@@ -175,13 +167,15 @@ function scrRedrawAllRanges(_hoverNode) {
     }
     
     // Hero move + attack range drawn last so it wins on overlapping tiles
-    if (oSelector.heroSelected && oSelector.selected[oSelector.heroIndex][1] != noone) {
+    if (oSelector.heroSelected && oSelector.selectedHero != noone
+        && oSelector.selected[oSelector.heroIndex][1] != noone) {
         scrMovementRange(
             oSelector.selected[oSelector.heroIndex][1],
             false,
             oSelector.selectedHero.move,
             oSelector.selectedHero.attackRange,
-            false
+            false,
+            oSelector.selectedHero
         );
     }
     else {
@@ -208,6 +202,233 @@ function scrRedrawAllRanges(_hoverNode) {
     }
 }
 
+/// True if the hero may end their move on this tile (within range, not on an ally).
+function scrIsValidHeroMoveDest(_gx, _gy, _startNode) {
+    var _node = global.nodeMap[_gx, _gy];
+    if (_node == _startNode){
+        return true;
+    }
+ 
+    return _node.moveNode;
+}
+
+function scrSelectorBeginHero(_hero, _index, _node) {
+    with (oSelector) {
+        selectedHero = _hero;
+        heroIndex = _index;
+        heroSelected = true;
+        _hero.selected = true;
+        heroOriginGridX = _hero.gridX;
+        heroOriginGridY = _hero.gridY;
+        heroMoveCommitted = false;
+        if (_node != noone) {
+            selected[_index][1] = _node;
+        }
+    }
+}
+
+/// Returns node list from BFS parent links (start -> end), or incomplete list if unreachable.
+function scrGetHeroPathNodes(_startNode, _endNode) {
+    var _nodes = [];
+    var _n = _endNode;
+    while (_n != noone) {
+        array_insert(_nodes, 0, _n);
+        if (_n == _startNode) {
+            return _nodes;
+        }
+        _n = _n.parent;
+    }
+    return _nodes;
+}
+
+/// Builds a path resource from BFS parent links (start -> end).
+function scrBuildHeroMovePath(_hero, _startNode, _endNode) {
+    var _nodes = scrGetHeroPathNodes(_startNode, _endNode);
+    path_clear_points(_hero.movePath);
+    if (array_length(_nodes) < 2) {
+        path_add_point(_hero.movePath, _startNode.gridX * GRIDSIZE, _startNode.gridY * GRIDSIZE, 100);
+        path_add_point(_hero.movePath, _endNode.gridX * GRIDSIZE, _endNode.gridY * GRIDSIZE, 100);
+    }
+    else {
+        for (var ii = 0; ii < array_length(_nodes); ii++) {
+            var _node = _nodes[ii];
+            path_add_point(_hero.movePath, _node.gridX * GRIDSIZE, _node.gridY * GRIDSIZE, 100);
+        }
+    }
+    return path_get_number(_hero.movePath) > 1;
+}
+
+function scrHeroCommitMove(_targetNode) {
+    with (oSelector) {
+        var _hero = selectedHero;
+        var _startNode = selected[heroIndex][1];
+        if (_targetNode == _startNode) {
+            return;
+        }
+        if (!scrBuildHeroMovePath(_hero, _startNode, _targetNode)) {
+            return;
+        }
+        heroMoveStartNode = _startNode;
+        heroMoveTargetNode = _targetNode;
+        heroMoving = true;
+        _startNode.occupant = noone;
+        with (_hero) {
+            isMoving = true;
+            sprite_index = states.walk.right;
+            path_start(movePath, moveSpeed, path_action_stop, false);
+        }
+    }
+}
+
+function scrHeroMoveFinish(_hero) {
+    if (!instance_exists(oSelector) || oSelector.selectedHero != _hero) {
+        return;
+    }
+    with (oSelector) {
+        if (!heroMoving || heroMoveTargetNode == noone) {
+            return;
+        }
+        var _target = heroMoveTargetNode;
+        _target.occupant = _hero;
+        _hero.gridX = _target.gridX;
+        _hero.gridY = _target.gridY;
+        _hero.x = _target.gridX * GRIDSIZE;
+        _hero.y = _target.gridY * GRIDSIZE;
+        _hero.sprite_index = _hero.states.idle.right;
+        selected[heroIndex][1] = _target;
+        heroMoveCommitted = true;
+        heroMoving = false;
+        heroMoveTargetNode = noone;
+        heroMoveStartNode = noone;
+        gridX = _target.gridX;
+        gridY = _target.gridY;
+        x = _hero.x;
+        y = _hero.y;
+        selectorPaused = false;
+        scrRedrawAllRanges(noone);
+    }
+}
+
+function scrHeroCancelMove() {
+    with (oSelector) {
+        if (!heroMoving) {
+            return;
+        }
+        var _hero = selectedHero;
+        with (_hero) {
+            path_end();
+            isMoving = false;
+            sprite_index = states.idle.right;
+        }
+        if (heroMoveStartNode != noone) {
+            heroMoveStartNode.occupant = _hero;
+        }
+        if (heroMoveTargetNode != noone && heroMoveTargetNode.occupant == _hero) {
+            heroMoveTargetNode.occupant = noone;
+        }
+        _hero.gridX = heroOriginGridX;
+        _hero.gridY = heroOriginGridY;
+        _hero.x = heroOriginGridX * GRIDSIZE;
+        _hero.y = heroOriginGridY * GRIDSIZE;
+        selected[heroIndex][1] = heroMoveStartNode;
+        gridX = heroOriginGridX;
+        gridY = heroOriginGridY;
+        x = _hero.x;
+        y = _hero.y;
+        heroMoving = false;
+        heroMoveTargetNode = noone;
+        heroMoveStartNode = noone;
+        selectorPaused = false;
+    }
+}
+
+function scrHeroUndoMove() {
+    with (oSelector) {
+        if (heroMoving) {
+            scrHeroCancelMove();
+            return;
+        }
+        if (!heroMoveCommitted) {
+            return;
+        }
+        var _hero = selectedHero;
+        var _currentNode = selected[heroIndex][1];
+        var _originNode = global.nodeMap[heroOriginGridX, heroOriginGridY];
+        _currentNode.occupant = noone;
+        _originNode.occupant = _hero;
+        _hero.gridX = heroOriginGridX;
+        _hero.gridY = heroOriginGridY;
+        _hero.x = heroOriginGridX * GRIDSIZE;
+        _hero.y = heroOriginGridY * GRIDSIZE;
+        selected[heroIndex][1] = _originNode;
+        gridX = heroOriginGridX;
+        gridY = heroOriginGridY;
+        x = _hero.x;
+        y = _hero.y;
+        heroMoveCommitted = false;
+    }
+}
+
+function scrDrawHeroMoveArrowHead(_toX, _toY, _dir, _colour) {
+    draw_set_colour(_colour);
+    var _headLen = 10;
+    var _backX = _toX - lengthdir_x(_headLen, _dir);
+    var _backY = _toY - lengthdir_y(_headLen, _dir);
+    draw_triangle(
+        _toX, _toY,
+        _backX + lengthdir_x(6, _dir + 90), _backY + lengthdir_y(6, _dir + 90),
+        _backX + lengthdir_x(6, _dir - 90), _backY + lengthdir_y(6, _dir - 90),
+        false
+    );
+}
+
+/// Straight segment fallback (invalid destination).
+function scrDrawHeroMoveArrow(_fromX, _fromY, _toX, _toY, _colour = c_yellow) {
+    var _dir = point_direction(_fromX, _fromY, _toX, _toY);
+    var _dist = point_distance(_fromX, _fromY, _toX, _toY);
+    if (_dist < 4) {
+        return;
+    }
+    draw_set_colour(_colour);
+    draw_set_alpha(0.95);
+    draw_line_width(_fromX, _fromY, _toX, _toY, 3);
+    scrDrawHeroMoveArrowHead(_toX, _toY, _dir, _colour);
+    draw_set_alpha(1);
+}
+
+/// Preview arrow following BFS parent path; straight line if path is missing.
+function scrDrawHeroMovePreview(_startNode, _endNode, _colour = c_yellow) {
+    var _nodes = scrGetHeroPathNodes(_startNode, _endNode);
+    var _count = array_length(_nodes);
+    if (_count < 2 || _nodes[0] != _startNode) {
+        var _fromX = _startNode.gridX * GRIDSIZE + GHALF;
+        var _fromY = _startNode.gridY * GRIDSIZE + GHALF;
+        var _toX = _endNode.gridX * GRIDSIZE + GHALF;
+        var _toY = _endNode.gridY * GRIDSIZE + GHALF;
+        scrDrawHeroMoveArrow(_fromX, _fromY, _toX, _toY, _colour);
+        return;
+    }
+    draw_set_colour(_colour);
+    draw_set_alpha(0.95);
+    // Match movePath points (grid corners); offset to cell center for visibility
+    var _prevX = _nodes[0].gridX * GRIDSIZE + GHALF;
+    var _prevY = _nodes[0].gridY * GRIDSIZE + GHALF;
+    for (var i = 1; i < _count; i++) {
+        var _nextX = _nodes[i].gridX * GRIDSIZE + GHALF;
+        var _nextY = _nodes[i].gridY * GRIDSIZE + GHALF;
+        draw_line_width(_prevX, _prevY, _nextX, _nextY, 3);
+        _prevX = _nextX;
+        _prevY = _nextY;
+    }
+    var _dir = point_direction(
+        _nodes[_count - 2].gridX * GRIDSIZE + GHALF,
+        _nodes[_count - 2].gridY * GRIDSIZE + GHALF,
+        _prevX, _prevY
+    );
+    scrDrawHeroMoveArrowHead(_prevX, _prevY, _dir, _colour);
+    draw_set_alpha(1);
+}
+
 //node ID to color, Actor's army, is Actor selected, Actor's move, Node's G score. 
 // If G score is greater than move, but still in the array that means its in the attack range
 function scrColorMoveNode(_node, _army,_selected, _move, _cost,_cancel){
@@ -221,13 +442,17 @@ function scrColorMoveNode(_node, _army,_selected, _move, _cost,_cancel){
     }
     else{
         //Blue army never saves attack nodes
-        if(_army = BLUEARMY){ 
-          if(_node.moveNode){
+        if(_node.allyPassNode){
+            _node.sprite_index = sMoveNode;
+            _node.saveNode = false;
+        }
+        else if(_army == BLUEARMY){ 
+            if(_node.moveNode){
               _node.sprite_index = sMoveNode;
-          }
-          else if(_node.passable){
-              _node.sprite_index = sAttackNode;
-          }
+            }
+            else if(_node.passable){
+                _node.sprite_index = sAttackNode;
+            }
         }
         //If red army
         else{

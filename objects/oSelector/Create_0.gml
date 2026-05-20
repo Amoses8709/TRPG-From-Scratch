@@ -29,8 +29,14 @@ selectedEnemies = 0;
 heroSelected = false;
 selectedHero = noone;
 deselectedEnemy = noone;
-heroIndex = pointer_null;
 activeEnemies = 0;
-
-//moving = false;
 alarmPause = 10;
+
+heroIndex = pointer_null;
+heroOriginGridX = 0;
+heroOriginGridY = 0;
+heroMoveCommitted = false;
+heroMoving = false;
+heroMoveTargetNode = noone;
+heroMoveStartNode = noone;
+

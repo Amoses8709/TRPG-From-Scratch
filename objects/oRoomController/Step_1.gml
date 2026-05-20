@@ -1,4 +1,5 @@
 if(roundCounter=0){
+    roundCounter++;
     with(oHeroChar){
         array_push(other.heroChars,id);
     }
@@ -52,7 +53,9 @@ with(oNode){
         }
     }
     else{
-        occupant= noone;
+        //The node is empty and no object if no collisions
+        occupant = noone;
+        noObject = !collision(gridX, gridY, "Env");
     }
     
 }
